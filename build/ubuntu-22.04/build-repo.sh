@@ -88,7 +88,7 @@ mkdir -p $HOST_REPO
 set -ex
 
 build_shim
-build_grub
+#build_grub
 build_kernel
 build_qemu
 build_tdvf
