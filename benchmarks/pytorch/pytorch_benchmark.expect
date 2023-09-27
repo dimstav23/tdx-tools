@@ -1,0 +1,37 @@
+#!/usr/bin/expect -f
+
+#starts guest vm, run benchmarks, poweroff
+set timeout -1
+
+set tdx_tools [file normalize [file dirname $argv0]]/../..
+
+#first argument indicates td type: td or efi
+set vm_type [lindex $argv 0];
+#second argument indicates number of cores -> threads for pytorch
+set cores [lindex $argv 1];
+
+#Start the guest VM
+spawn sudo $tdx_tools/start-qemu.sh -i $tdx_tools/build/ubuntu-22.04/guest-image/td-guest-ubuntu-22.04.qcow2 -k $tdx_tools/build/ubuntu-22.04/vmlinuz -t $vm_type -b direct -c $cores 
+
+#Login process
+expect "login: "
+#Enter username
+send -- "root\r"
+
+#Enter Password
+expect "Password: "
+send -- "123456\r"
+
+#Expect the login to be done
+expect "# "
+send -- "export QEMU_VM_TYPE=$vm_type\r"
+#Expect the export to be done
+expect "# "
+send -- "cd /root/gramine-examples/pytorch\r"
+#Expect the cd to be done
+expect "# "
+send -- "python3 pytorchexample.py\r"
+
+#expect the experiment to finish and poweroff the Guest VM
+expect "# "
+send -- "shutdown -h now\r"
