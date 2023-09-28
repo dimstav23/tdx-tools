@@ -13,6 +13,3 @@ for vm in "${vm_types[@]}"; do
     $THIS_DIR/pytorch_benchmark.expect $vm $cpu
   done
 done
-
-# Gather & print the results
-# $THIS_DIR/../../build/ubuntu-22.04/guest-image/td-guest-ubuntu-22.04.qcow2
