@@ -3,7 +3,7 @@
 #starts guest vm, run benchmarks, poweroff
 set timeout -1
 
-set tdx_tools [file normalize [file dirname $argv0]]/../..
+set curr_dir [file normalize [file dirname $argv0]]
 
 #first argument indicates td type: td or efi
 set vm_type [lindex $argv 0];
@@ -11,7 +11,7 @@ set vm_type [lindex $argv 0];
 set cores [lindex $argv 1];
 
 #Start the guest VM
-spawn sudo $tdx_tools/start-qemu.sh -i $tdx_tools/build/ubuntu-22.04/guest-image/td-guest-ubuntu-22.04.qcow2 -k $tdx_tools/build/ubuntu-22.04/vmlinuz -t $vm_type -b direct -c $cores 
+spawn sudo $curr_dir/../../start-qemu.sh -i $curr_dir/td-guest-ubuntu-22.04.qcow2 -k $curr_dir/vmlinuz -t $vm_type -b direct -c $cores 
 
 #Login process
 expect "login: "

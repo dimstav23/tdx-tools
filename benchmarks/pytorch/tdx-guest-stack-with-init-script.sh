@@ -10,7 +10,7 @@ IMG_URL=https://cloud-images.ubuntu.com/jammy/current
 CLOUD_IMG=jammy-server-cloudimg-amd64.img
 TD_IMG=td-guest-ubuntu-22.04.qcow2
 REPO_NAME="guest_repo"
-REPO_LOCAL=${THIS_DIR}/../${REPO_NAME}
+REPO_LOCAL=${THIS_DIR}/../../build/ubuntu-22.04/${REPO_NAME}
 INIT_SCRIPT=""
 
 usage() {
