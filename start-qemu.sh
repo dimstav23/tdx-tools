@@ -74,7 +74,7 @@ SERIAL_CONSOLE="-serial stdio"
 # Default template for QEMU command line
 QEMU_CMD="${QEMU_EXEC} -accel kvm \
           -name process=tdxvm,debug-threads=on \
-          -m $MEM -vga none \
+          -vga none \
           -monitor pty \
           -no-hpet -nodefaults"
 PARAM_CPU=" -cpu host,-kvm-steal-time,pmu=off"
@@ -93,6 +93,7 @@ Usage: $(basename "$0") [OPTION]...
   -m <11:22:33:44:55:66>    MAC address, impact TDX measurement RTMR
   -q [tdvmcall|vsock]       Support for TD quote using tdvmcall or vsock
   -c <number>               Number of CPUs, default is 1
+  -g <number>               VM memory in GBs, default is 2
   -r <root partition>       root partition for direct boot, default is /dev/vda1
   -n <network CIDR>         Network CIDR for TD VM, default is "10.0.2.0/24"
   -a <DHCP start>           Network started address, default is "10.0.2.15"
@@ -115,7 +116,7 @@ warn() {
 }
 
 process_args() {
-    while getopts ":i:k:t:b:p:f:o:a:m:vdshq:c:r:n:s:e:w:" option; do
+    while getopts ":i:k:t:b:p:f:o:a:m:vdshq:c:g:r:n:s:e:w:" option; do
         case "$option" in
             i) GUEST_IMG=$OPTARG;;
             k) KERNEL=$OPTARG;;
@@ -130,6 +131,7 @@ process_args() {
             s) USE_SERIAL_CONSOLE=true;;
             q) QUOTE_TYPE=$OPTARG;;
             c) CPUS=$OPTARG;;
+            g) MEM=$OPTARG;;
             r) ROOT_PARTITION=$OPTARG;;
             n) NET_CIDR=$OPTARG;;
             a) DHCP_START=$OPTARG;;
@@ -153,6 +155,11 @@ process_args() {
     # Validate the number of CPUs
     if ! [[ ${CPUS} =~ ^[0-9]+$ && ${CPUS} -gt 0 ]]; then
         error "Invalid number of CPUs: ${CPUS}"
+    fi
+
+    # Validate the amount of memory
+    if ! [[ ${MEM} =~ ^[0-9]+$ && ${MEM} -gt 0 ]]; then
+        error "Invalid amount of Memory specified: ${MEM}"
     fi
 
     GUEST_IMG="${GUEST_IMG:-${DEFAULT_GUEST_IMG}}"
@@ -265,6 +272,9 @@ process_args() {
 
     # Specify the number of CPUs
     QEMU_CMD+=" -smp ${CPUS} "
+
+    # Specify the amount of Memory
+    QEMU_CMD+=" -m ${MEM}G "
 
     # Enable vsock
     if [[ ${USE_VSOCK} == true ]]; then

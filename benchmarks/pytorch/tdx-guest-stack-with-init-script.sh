@@ -74,6 +74,7 @@ ARGS+=" --run-command 'systemctl mask pollinate.service'"
 # Copy the init script and run it after the initial guest setup
 ARGS+=" --copy-in ${INIT_SCRIPT}:/root/"
 ARGS+=" --memsize 4096" # to avoid running out of memory during the init script exec
+ARGS+=" --smp 16" # provide 16 cores for the run scripts to use
 ARGS+=" --run-command '/root/${INIT_SCRIPT}'"
 
 echo "${ARGS}"
