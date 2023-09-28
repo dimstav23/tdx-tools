@@ -93,7 +93,8 @@ Usage: $(basename "$0") [OPTION]...
   -m <11:22:33:44:55:66>    MAC address, impact TDX measurement RTMR
   -q [tdvmcall|vsock]       Support for TD quote using tdvmcall or vsock
   -c <number>               Number of CPUs, default is 1
-  -g <number>               VM memory in GBs, default is 2
+  -g <number[M|G]>          VM memory, default is 2G
+  -u <number[M|G]>          EPC size, default is 64M
   -r <root partition>       root partition for direct boot, default is /dev/vda1
   -n <network CIDR>         Network CIDR for TD VM, default is "10.0.2.0/24"
   -a <DHCP start>           Network started address, default is "10.0.2.15"
@@ -116,7 +117,7 @@ warn() {
 }
 
 process_args() {
-    while getopts ":i:k:t:b:p:f:o:a:m:vdshq:c:g:r:n:s:e:w:" option; do
+    while getopts ":i:k:t:b:p:f:o:a:m:vdshq:c:g:u:r:n:s:e:w:" option; do
         case "$option" in
             i) GUEST_IMG=$OPTARG;;
             k) KERNEL=$OPTARG;;
@@ -132,6 +133,7 @@ process_args() {
             q) QUOTE_TYPE=$OPTARG;;
             c) CPUS=$OPTARG;;
             g) MEM=$OPTARG;;
+            u) SGX_EPC_SIZE=$OPTARG;;
             r) ROOT_PARTITION=$OPTARG;;
             n) NET_CIDR=$OPTARG;;
             a) DHCP_START=$OPTARG;;
@@ -157,9 +159,13 @@ process_args() {
         error "Invalid number of CPUs: ${CPUS}"
     fi
 
-    # Validate the amount of memory
-    if ! [[ ${MEM} =~ ^[0-9]+$ && ${MEM} -gt 0 ]]; then
+    # Validate the amount of VM memory and EPC memory
+    pattern="^[0-9]+[MG]$"
+    if ! [[ ${MEM} =~ $pattern ]]; then
         error "Invalid amount of Memory specified: ${MEM}"
+    fi
+    if ! [[ ${SGX_EPC_SIZE} =~ $pattern ]]; then
+        error "Invalid amount of EPC memory specified: ${SGX_EPC_SIZE}"
     fi
 
     GUEST_IMG="${GUEST_IMG:-${DEFAULT_GUEST_IMG}}"
@@ -274,7 +280,7 @@ process_args() {
     QEMU_CMD+=" -smp ${CPUS} "
 
     # Specify the amount of Memory
-    QEMU_CMD+=" -m ${MEM}G "
+    QEMU_CMD+=" -m ${MEM} "
 
     # Enable vsock
     if [[ ${USE_VSOCK} == true ]]; then
@@ -321,10 +327,14 @@ process_args() {
     echo "OVMF              : ${OVMF}"
     echo "VM Type           : ${VM_TYPE}"
     echo "CPUS              : ${CPUS}"
+    echo "Memory            : ${MEM}"
     echo "Boot type         : ${BOOT_TYPE}"
     echo "Monitor port      : ${MONITOR_PORT}"
     echo "Enable vsock      : ${USE_VSOCK}"
     echo "Enable debug      : ${DEBUG}"
+    if [[ ${VM_TYPE} == "sgx" ]]; then
+        echo "SGX EPC SIZE      : ${SGX_EPC_SIZE}"
+    fi
     if [[ -n ${MAC_ADDR} ]]; then
         echo "MAC Address       : ${MAC_ADDR}"
     fi

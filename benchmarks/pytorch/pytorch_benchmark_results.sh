@@ -13,6 +13,7 @@ sudo guestmount -a $THIS_DIR/td-guest-ubuntu-22.04.qcow2 -i --ro $MOUNTPOINT
 mkdir -p $RESULTS_DIR
 sudo bash -c "cp $MOUNTPOINT/root/gramine-examples/pytorch/td_* $RESULTS_DIR"
 sudo bash -c "cp $MOUNTPOINT/root/gramine-examples/pytorch/efi_* $RESULTS_DIR"
+sudo bash -c "cp $MOUNTPOINT/root/gramine-examples/pytorch/sgx_* $RESULTS_DIR"
 
 sudo umount $MOUNTPOINT
 rm -rf $MOUNTPOINT

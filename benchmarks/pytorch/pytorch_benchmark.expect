@@ -11,10 +11,15 @@ set vm_type [lindex $argv 0];
 set cores [lindex $argv 1];
 #third argument indicates gigs of memory for the VM
 set memory [lindex $argv 2];
+#fourth argument indicates EPC memory for the VM (only for SGX vm_type)
+set epc_memory [lindex $argv 3];
 
 #Start the guest VM
-spawn sudo $curr_dir/../../start-qemu.sh -i $curr_dir/td-guest-ubuntu-22.04.qcow2 -k $curr_dir/vmlinuz -t $vm_type -b direct -c $cores -g $memory 
-
+if { $vm_type == "sgx"} {
+  spawn sudo $curr_dir/../../start-qemu.sh -i $curr_dir/td-guest-ubuntu-22.04.qcow2 -k $curr_dir/vmlinuz -t $vm_type -b direct -c $cores -g $memory -u $epc_memory
+} else {
+  spawn sudo $curr_dir/../../start-qemu.sh -i $curr_dir/td-guest-ubuntu-22.04.qcow2 -k $curr_dir/vmlinuz -t $vm_type -b direct -c $cores -g $memory 
+}
 #Login process
 expect "login: "
 #Enter username

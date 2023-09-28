@@ -18,6 +18,7 @@ cd /root/gramine
 meson setup build/ --buildtype=release -Ddirect=enabled -Dsgx=enabled
 ninja -C build/
 ninja -C build/ install
+export PATH="/usr/local/bin/:$PATH" # to identify the gramine binaries
 
 #Setup the pytorch example
 cd /root
