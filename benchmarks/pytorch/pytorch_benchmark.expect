@@ -41,7 +41,13 @@ send -- "cd /root/examples/pytorch\r"
 #Expect the cd to be done
 expect "# "
 if { $vm_type == "sgx"} {
+  #run both the gramine-sgx and gramine-direct variants
   send -- "gramine-sgx ./pytorch pytorchexample.py\r"
+  expect "# "
+  #update the QEMU_VM_TYPE variable for the result files naming
+  send -- "export QEMU_VM_TYPE=sgx-direct\r"
+  expect "# "
+  send -- "gramine-direct ./pytorch pytorchexample.py\r"
 } else {
   send -- "python3 pytorchexample.py\r"
 }
