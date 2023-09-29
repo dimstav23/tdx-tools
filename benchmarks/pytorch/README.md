@@ -31,7 +31,7 @@ run the following in the current directory:
 $ ./pytorch_benchmark_runner.sh
 ```
 This command spawns TDX and regular VMs with the desirable CPU core count and executes the pytorch application.<br>
-The results are stored in the `/root/gramine-examples/pytorch` directory of the guest filesystem.<br>
+The results are stored in the `/root/examples/pytorch/results` directory of the guest filesystem.<br>
 The filenames are in the `[vm_type]_[numer_of_threads]_threads.txt` format.
 
 2. **Results gathering & printing**

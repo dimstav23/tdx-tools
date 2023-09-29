@@ -37,7 +37,7 @@ expect "# "
 send -- "export QEMU_VM_TYPE=$vm_type\r"
 #Expect the export to be done
 expect "# "
-send -- "cd /root/gramine-examples/pytorch\r"
+send -- "cd /root/examples/pytorch\r"
 #Expect the cd to be done
 expect "# "
 if { $vm_type == "sgx"} {

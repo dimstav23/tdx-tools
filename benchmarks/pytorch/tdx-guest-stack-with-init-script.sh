@@ -71,6 +71,9 @@ ARGS+=" --run-command 'ssh-keygen -A'"
 ARGS+=" --run-command 'dpkg -i /srv/${REPO_NAME}/linux-*.deb'"
 ARGS+=" --run-command 'systemctl mask pollinate.service'"
 
+# Copy the gramine examples patch
+ARGS+=" --copy-in gramine_examples.patch:/root/"
+
 # Copy the init script and run it after the initial guest setup
 ARGS+=" --copy-in ${INIT_SCRIPT}:/root/"
 ARGS+=" --memsize 4096" # to avoid running out of memory during the init script exec
