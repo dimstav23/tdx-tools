@@ -224,10 +224,10 @@ index 7965804..b72a5c9 100644
  sgx.trusted_files = [
    "file:{{ gramine.libos }}",
 diff --git a/pytorch/pytorch.manifest.template b/pytorch/pytorch.manifest.template
-index e3beeb7..f486cb4 100644
+index e3beeb7..107b3b9 100644
 --- a/pytorch/pytorch.manifest.template
 +++ b/pytorch/pytorch.manifest.template
-@@ -10,9 +10,18 @@ loader.log_level = "{{ log_level }}"
+@@ -10,9 +10,19 @@ loader.log_level = "{{ log_level }}"
  loader.env.LD_LIBRARY_PATH = "/lib:/usr/lib:{{ arch_libdir }}:/usr/{{ arch_libdir }}"
  loader.env.HOME = "{{ env.HOME }}"
  
@@ -244,10 +244,11 @@ index e3beeb7..f486cb4 100644
 +#loader.env.DNNL_VERBOSE = "1"
 +loader.env.QEMU_CPU_NUM = { passthrough = true }
 +loader.env.QEMU_VM_TYPE = { passthrough = true }
++loader.env.OMP_NUM_THREADS = { passthrough = true }
  
  loader.insecure__use_cmdline_argv = true
  
-@@ -29,8 +38,8 @@ fs.mounts = [
+@@ -29,8 +39,8 @@ fs.mounts = [
    { type = "tmpfs", path = "/tmp" },
  ]
  
@@ -258,7 +259,7 @@ index e3beeb7..f486cb4 100644
  sgx.edmm_enable = {{ 'true' if env.get('EDMM', '0') == '1' else 'false' }}
  
  sgx.trusted_files = [
-@@ -53,6 +62,7 @@ sgx.trusted_files = [
+@@ -53,6 +63,7 @@ sgx.trusted_files = [
  
  sgx.allowed_files = [
    "file:result.txt",
@@ -267,42 +268,47 @@ index e3beeb7..f486cb4 100644
  
  # Gramine optionally provides patched OpenMP runtime library that runs faster inside SGX enclaves
 diff --git a/pytorch/pytorchexample.py b/pytorch/pytorchexample.py
-index 4185ff3..c437082 100644
+index 4185ff3..b67528d 100644
 --- a/pytorch/pytorchexample.py
 +++ b/pytorch/pytorchexample.py
-@@ -1,6 +1,8 @@
+@@ -1,6 +1,9 @@
  # This PyTorch image classification example is based off
  # https://www.learnopencv.com/pytorch-for-beginners-image-classification-using-pre-trained-models/
  
++import sys
 +import time
 +import os
  from torchvision import models
  import torch
  
-@@ -23,28 +25,52 @@ transform = transforms.Compose([
+@@ -23,28 +26,56 @@ transform = transforms.Compose([
  from PIL import Image
  img = Image.open("input.jpg")
  
 -# Apply the transform to the image.
 -img_t = transform(img)
-+vm_type = os.environ.get('QEMU_VM_TYPE')
-+if vm_type == None:
-+    print("QEMU_VM_TYPE environment variable not specified")
-+    print("Options: td|efi|sgx")
-+    exit()
++if len(sys.argv) != 3:
++    print("Usage: ptyhon pytorchexample.py <cpu_count> <experiment_label>")
++    sys.exit(1)
  
 -# Magic (not sure what this does).
 -batch_t = torch.unsqueeze(img_t, 0)
-+cpu_num = int(os.environ.get('QEMU_CPU_NUM', "0"))
-+if cpu_num == 0:
-+    cpu_num = os.cpu_count()
-+torch.set_num_threads(cpu_num)
-+print("Number of threads: %d" % torch.get_num_threads(), flush=True)
-+start_time = time.time()
++try:
++    cpu_count = int(sys.argv[1])
++except ValueError:
++    print("Error: CPU count must be an int!")
++    sys.exit(1)
  
 -# Prepare the model and run the classifier.
 -alexnet.eval()
 -out = alexnet(batch_t)
++experiment_label = sys.argv[2]
++
++torch.set_num_threads(cpu_count)
++print("Number of threads: %d" % torch.get_num_threads(), flush=True)
++
++start_time = time.time()
++
 +for i in range(0, 1000):
 +    # Apply the transform to the image.
 +    img_t = transform(img)
@@ -323,11 +329,11 @@ index 4185ff3..c437082 100644
 +print("--- %.2f seconds ---" % (time.time() - start_time), flush=True)
 +
 +# Print the exec time.
-+with open("results/"+vm_type+"_"+str(cpu_num)+"_threads.txt", "w") as outfile:
++with open("results/"+experiment_label+"_"+str(cpu_count)+"_threads.txt", "w") as outfile:
 +    outfile.write(str(time.time() - start_time) + " seconds\n")
 +    outfile.flush()
 +    os.fsync(outfile.fileno())
-+print("The execution time result was written to results/"+vm_type+"_"+str(cpu_num)+"_threads.txt` .")
++print("The execution time result was written to results/"+experiment_label+"_"+str(cpu_count)+"_threads.txt` .")
  
  # Load the classes from disk.
  with open('classes.txt') as f:
