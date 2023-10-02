@@ -1,11 +1,13 @@
 # Pytorch example benchmarking
 
-## Prerequisites:
+## VM-based variants
+
+### Prerequisites:
 1. Packages required: `qemu-utils`, `libguestfs-tools`, `expect`
 2. Succesffuly built the required ubuntu guest tools (see [here](../../build/ubuntu-22.04/README.md#build-all))
 3. TDX-enabled host (see [here](../../build/ubuntu-22.04/README.md#install-tdx-host-packages)). The VMs of this benchmark automation use the OVMF files located in `/usr/share/qemu/` of the host. Please, make sure you have a properly configured the TDX host (e.g., TDX kernel, OVMF/TDVF).
 
-## Preparation steps
+### Preparation steps
 1. **Build the guest image**
 To build the tdx-enabled guest image with the dependencies of the pytorch example benchmark,
 run the following in the current directory:
@@ -23,7 +25,7 @@ $ rm -rf extracted
 ```
 This will create the `vmlinuz` kernel file in the current directory.
 
-## Execution steps
+### Execution steps
 1. **Benchmark execution**
 To execute the benchmark (i.e., the pytorch example with various thread counts in TDX VM and in regular VM),
 run the following in the current directory:
@@ -42,3 +44,27 @@ $ ./pytorch_benchmark_results.sh
 ```
 This command mounts the image, copies out the results in the `results` folder (created if not existing)
 and prints them in `stdout` in a table format.
+
+## Native variants
+
+### Prerequisites:
+1. TBD
+
+### Preparation steps
+1. To install the dependencies for the native variants of the pytorch example, 
+run the following in the current directory:
+```
+$ ./native_pytorch_benchmark_setup.sh
+```
+This script installs the dependencies (using `apt`), fetches, builds and installs Gramine and Gramine-TDX and retrieves & patches
+the pytorch application. All the repositories are placed in the newly created `deps` directory.
+
+### Execution steps
+1. To execute the benchmark (i.e., the pytorch example with various thread counts in all the native variants),
+run the following in the current directory:
+```
+$ ./native_pytorch_benchmark_runner.sh
+```
+This command executes the pytorch application in all the native variants with the desirable CPU core count.<br>
+The results are stored in the `results` directory current folder.<br>
+The filenames are in the `[vm_type]_[numer_of_threads]_threads.txt` format.
