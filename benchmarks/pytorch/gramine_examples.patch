@@ -224,10 +224,10 @@ index 7965804..b72a5c9 100644
  sgx.trusted_files = [
    "file:{{ gramine.libos }}",
 diff --git a/pytorch/pytorch.manifest.template b/pytorch/pytorch.manifest.template
-index e3beeb7..107b3b9 100644
+index e3beeb7..cf58a48 100644
 --- a/pytorch/pytorch.manifest.template
 +++ b/pytorch/pytorch.manifest.template
-@@ -10,9 +10,19 @@ loader.log_level = "{{ log_level }}"
+@@ -10,9 +10,18 @@ loader.log_level = "{{ log_level }}"
  loader.env.LD_LIBRARY_PATH = "/lib:/usr/lib:{{ arch_libdir }}:/usr/{{ arch_libdir }}"
  loader.env.HOME = "{{ env.HOME }}"
  
@@ -243,23 +243,22 @@ index e3beeb7..107b3b9 100644
 +#loader.env.MKL_VERBOSE = "1"
 +#loader.env.DNNL_VERBOSE = "1"
 +loader.env.QEMU_CPU_NUM = { passthrough = true }
-+loader.env.QEMU_VM_TYPE = { passthrough = true }
 +loader.env.OMP_NUM_THREADS = { passthrough = true }
  
  loader.insecure__use_cmdline_argv = true
  
-@@ -29,8 +39,8 @@ fs.mounts = [
+@@ -29,8 +38,8 @@ fs.mounts = [
    { type = "tmpfs", path = "/tmp" },
  ]
  
 -sgx.enclave_size = "4G"
 -sgx.max_threads = 32
-+sgx.enclave_size = "8G"
++sgx.enclave_size = "16G"
 +sgx.max_threads = 256
  sgx.edmm_enable = {{ 'true' if env.get('EDMM', '0') == '1' else 'false' }}
  
  sgx.trusted_files = [
-@@ -53,6 +63,7 @@ sgx.trusted_files = [
+@@ -53,6 +62,7 @@ sgx.trusted_files = [
  
  sgx.allowed_files = [
    "file:result.txt",

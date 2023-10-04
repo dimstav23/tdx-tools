@@ -8,7 +8,7 @@ RESULTS_DIR=$THIS_DIR/results
 GRAMINE_SGX_INSTALL_DIR=$DEPS_DIR/gramine/build-release
 GRAMINE_TDX_INSTALL_DIR=$DEPS_DIR/dkuvaisk.gramine-tdx/build-release
 BENCHMARK_DIR=$DEPS_DIR/examples/pytorch
-VM_MEM=16G
+VM_MEM=24G
 
 THREADS=(1 2 4 6 8 12 16 20 24 32)
 

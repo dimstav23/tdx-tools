@@ -3,7 +3,7 @@
 apt update
 
 #Install gramine dependencies
-apt install build-essential autoconf bison gawk nasm -y
+apt install build-essential autoconf bison gawk nasm numactl -y
 apt install ninja-build pkg-config python3 python3-click -y
 apt install python3-jinja2 python3-pip python3-pyelftools wget -y
 apt install meson python3-tomli python3-tomli-w -y
