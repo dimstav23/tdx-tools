@@ -4,7 +4,7 @@ set -e
 
 THIS_DIR=$(dirname "$(readlink -f "$0")")
 DEPS_DIR=$THIS_DIR/deps
-RESULTS_DIR=$THIS_DIR/results
+RESULTS_DIR=$THIS_DIR/../results
 GRAMINE_SGX_INSTALL_DIR=$DEPS_DIR/gramine/build-release
 GRAMINE_TDX_INSTALL_DIR=$DEPS_DIR/dkuvaisk.gramine-tdx/build-release
 BENCHMARK_DIR=$DEPS_DIR/examples/pytorch

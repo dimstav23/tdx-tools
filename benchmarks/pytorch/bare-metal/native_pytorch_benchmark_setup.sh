@@ -4,7 +4,7 @@ set -e
 
 THIS_DIR=$(dirname "$(readlink -f "$0")")
 DEPS_DIR=$THIS_DIR/deps
-EXAMPLES_PATCH=$THIS_DIR/gramine_examples.patch
+EXAMPLES_PATCH=$THIS_DIR/../gramine_examples.patch
 
 # Create the directory for the dependencies
 mkdir -p $DEPS_DIR
@@ -26,7 +26,7 @@ else
   echo "Cloning Gramine"
   git clone https://github.com/gramineproject/gramine.git
 fi
-cd /$DEPS_DIR/gramine
+cd $DEPS_DIR/gramine
 git checkout v1.5
 if [ -d "build-release" ]; then
   echo "Gramine build-release directory already exists"
@@ -47,7 +47,7 @@ else
   echo "Cloning Gramine-TDX"
   git clone https://github.com/intel-sandbox/dkuvaisk.gramine-tdx.git
 fi
-cd /$DEPS_DIR/dkuvaisk.gramine-tdx
+cd $DEPS_DIR/dkuvaisk.gramine-tdx
 git checkout 78c2af00dca5eccdd190836c21c7065b11bf2c8b
 if [ -d "build-release" ]; then
   echo "Gramine-TDX build-release directory already exists"

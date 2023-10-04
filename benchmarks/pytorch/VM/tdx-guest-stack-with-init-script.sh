@@ -10,7 +10,7 @@ IMG_URL=https://cloud-images.ubuntu.com/jammy/current
 CLOUD_IMG=jammy-server-cloudimg-amd64.img
 TD_IMG=td-guest-ubuntu-22.04.qcow2
 REPO_NAME="guest_repo"
-REPO_LOCAL=${THIS_DIR}/../../build/ubuntu-22.04/${REPO_NAME}
+REPO_LOCAL=${THIS_DIR}/../../../build/ubuntu-22.04/${REPO_NAME}
 INIT_SCRIPT=""
 
 usage() {
@@ -72,7 +72,7 @@ ARGS+=" --run-command 'dpkg -i /srv/${REPO_NAME}/linux-*.deb'"
 ARGS+=" --run-command 'systemctl mask pollinate.service'"
 
 # Copy the gramine examples patch
-ARGS+=" --copy-in gramine_examples.patch:/root/"
+ARGS+=" --copy-in ${THIS_DIR}/../gramine_examples.patch:/root/"
 
 # Copy the init script and run it after the initial guest setup
 ARGS+=" --copy-in ${INIT_SCRIPT}:/root/"

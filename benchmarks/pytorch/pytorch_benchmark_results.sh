@@ -8,7 +8,7 @@ RESULTS_DIR=$THIS_DIR/results
 
 # Gather the results from the guest image
 mkdir -p $MOUNTPOINT
-sudo guestmount -a $THIS_DIR/td-guest-ubuntu-22.04.qcow2 -i --ro $MOUNTPOINT
+sudo guestmount -a $THIS_DIR/VM/td-guest-ubuntu-22.04.qcow2 -i --ro $MOUNTPOINT
 
 mkdir -p $RESULTS_DIR
 sudo bash -c "cp -r $MOUNTPOINT/root/examples/pytorch/results/* $RESULTS_DIR"
