@@ -8,7 +8,6 @@ RESULTS_DIR=$THIS_DIR/../results
 GRAMINE_SGX_INSTALL_DIR=$DEPS_DIR/gramine/build-release
 GRAMINE_TDX_INSTALL_DIR=$DEPS_DIR/dkuvaisk.gramine-tdx/build-release
 BENCHMARK_DIR=$DEPS_DIR/examples/pytorch
-VM_MEM=24G
 
 THREADS=(1 2 4 6 8 12 16 20 24 32)
 
@@ -35,27 +34,26 @@ export PKG_CONFIG_PATH=$GRAMINE_SGX_INSTALL_DIR/lib/x86_64-linux-gnu/pkgconfig:$
 make clean && make SGX=1
 for THREAD_CNT in "${THREADS[@]}"; do
   export OMP_NUM_THREADS=$THREAD_CNT
-  gramine-direct ./pytorch pytorchexample.py $THREAD_CNT bm-gramine-direct
+  numactl --cpunodebind=0 --membind=0 gramine-direct ./pytorch pytorchexample.py $THREAD_CNT bm-gramine-direct
 done
 for THREAD_CNT in "${THREADS[@]}"; do
   export OMP_NUM_THREADS=$THREAD_CNT
-  gramine-sgx ./pytorch pytorchexample.py $THREAD_CNT bm-gramine-sgx
+  numactl --cpunodebind=0 --membind=0 gramine-sgx ./pytorch pytorchexample.py $THREAD_CNT bm-gramine-sgx
 done
 
 # Run the gramine-vm and gramine-tdx case
+# Note: VM memory is taken from the manifest enclave size = 16G
 export PATH=$GRAMINE_TDX_INSTALL_DIR/bin:$CURR_PATH
 export PYTHONPATH=$GRAMINE_TDX_INSTALL_DIR/lib/python3.10/site-packages:$CURR_PYTHONPATH
 export PKG_CONFIG_PATH=$GRAMINE_TDX_INSTALL_DIR/lib/x86_64-linux-gnu/pkgconfig:$CURR_PKG_CONFIG_PATH
 make clean && make SGX=1
 for THREAD_CNT in "${THREADS[@]}"; do
   export QEMU_CPU_NUM=$THREAD_CNT
-  export QEMU_MEM_SIZE=$VM_MEM
   export OMP_NUM_THREADS=$THREAD_CNT
   gramine-vm ./pytorch pytorchexample.py $THREAD_CNT gramine-vm
 done
 for THREAD_CNT in "${THREADS[@]}"; do
   export QEMU_CPU_NUM=$THREAD_CNT
-  export QEMU_MEM_SIZE=$VM_MEM
   export OMP_NUM_THREADS=$THREAD_CNT
   gramine-tdx ./pytorch pytorchexample.py $THREAD_CNT gramine-tdx
 done
