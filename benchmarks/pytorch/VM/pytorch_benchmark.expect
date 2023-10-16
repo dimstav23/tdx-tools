@@ -15,10 +15,10 @@ set memory [lindex $argv 2];
 set epc_memory [lindex $argv 3];
 
 #Start the guest VM
-if { $vm_type == "sgx"} {
-  spawn sudo $curr_dir/../../../start-qemu.sh -i $curr_dir/td-guest-ubuntu-22.04.qcow2 -k $curr_dir/vmlinuz -t $vm_type -b direct -c $cores -g $memory -u $epc_memory
+if { $vm_type == "sgx" } {
+  spawn sudo numactl --cpunodebind=0 --membind=0 $curr_dir/../../../start-qemu.sh -i $curr_dir/td-guest-ubuntu-22.04.qcow2 -k $curr_dir/vmlinuz -t $vm_type -b direct -c $cores -g $memory -u $epc_memory
 } else {
-  spawn sudo $curr_dir/../../../start-qemu.sh -i $curr_dir/td-guest-ubuntu-22.04.qcow2 -k $curr_dir/vmlinuz -t $vm_type -b direct -c $cores -g $memory 
+  spawn sudo numactl --cpunodebind=0 --membind=0 $curr_dir/../../../start-qemu.sh -i $curr_dir/td-guest-ubuntu-22.04.qcow2 -k $curr_dir/vmlinuz -t $vm_type -b direct -c $cores -g $memory 
 }
 #Login process
 expect "login: "
@@ -36,14 +36,16 @@ send -- "cd /root/examples/pytorch\r"
 expect "# "
 send -- "export OMP_NUM_THREADS=$cores\r"
 expect "# "
-if { $vm_type == "sgx"} {
+if { $vm_type == "sgx" } {
   #run both the gramine-sgx and gramine-direct variants
-  send -- "gramine-sgx ./pytorch pytorchexample.py $cores vm-gramine-sgx\r"
-  expect "# "
   send -- "gramine-direct ./pytorch pytorchexample.py $cores vm-gramine-direct\r"
+  expect "# "
+  send -- "gramine-sgx ./pytorch pytorchexample.py $cores vm-gramine-sgx\r"
 } else {
   send -- "python3 pytorchexample.py $cores $vm_type\r"
 }
 #expect the experiment to finish and poweroff the Guest VM
 expect "# "
 send -- "shutdown -h now\r"
+# wait till the VM shuts down
+expect "$ "
