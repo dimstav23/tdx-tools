@@ -34,6 +34,9 @@ This command spawns TDX and regular VMs with the desirable CPU core count and ex
 The results are stored in the `/root/examples/pytorch/results` directory of the guest filesystem.<br>
 The filenames are in the `[vm_type]_[numer_of_threads]_threads.txt` format.
 
+**Known bug:** `gramine-sgx` experiments inside the VM sometimes hang for high number of cores (> 16) during `import torch`.
+If this is the case, they have to be executed manually. 
+
 2. **Results gathering & printing**
 To gather the results from the above execution and pretty-print them in a table,
 run the following in the parent directory:
