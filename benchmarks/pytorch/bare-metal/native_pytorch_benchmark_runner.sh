@@ -50,12 +50,12 @@ make clean && make SGX=1
 for THREAD_CNT in "${THREADS[@]}"; do
   export QEMU_CPU_NUM=$THREAD_CNT
   export OMP_NUM_THREADS=$THREAD_CNT
-  gramine-vm ./pytorch pytorchexample.py $THREAD_CNT gramine-vm
+  numactl --cpunodebind=0 --membind=0 gramine-vm ./pytorch pytorchexample.py $THREAD_CNT gramine-vm
 done
 for THREAD_CNT in "${THREADS[@]}"; do
   export QEMU_CPU_NUM=$THREAD_CNT
   export OMP_NUM_THREADS=$THREAD_CNT
-  gramine-tdx ./pytorch pytorchexample.py $THREAD_CNT gramine-tdx
+  numactl --cpunodebind=0 --membind=0 gramine-tdx ./pytorch pytorchexample.py $THREAD_CNT gramine-tdx
 done
 
 mkdir -p $RESULTS_DIR
