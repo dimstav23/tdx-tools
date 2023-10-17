@@ -6,7 +6,7 @@ THIS_DIR=$(dirname "$(readlink -f "$0")")
 
 # Run the experiments
 vm_mem="32G" # VM memory
-epc_mem="16G" # EPC memory for the VM (only used for sgx)
+epc_mem="32G" # EPC memory for the VM (only used for sgx)
 vm_types=("td" "efi" "sgx")
 cpus=(1 2 4 6 8 12 16 20 24 32)
 
