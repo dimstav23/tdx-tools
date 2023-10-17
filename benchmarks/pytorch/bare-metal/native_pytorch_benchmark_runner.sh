@@ -18,8 +18,7 @@ mkdir -p results
 
 # Run the native case
 for THREAD_CNT in "${THREADS[@]}"; do
-  export OMP_NUM_THREADS=$THREAD_CNT
-  python3 pytorchexample.py $THREAD_CNT native
+  numactl --cpunodebind=0 --membind=0 python3 pytorchexample.py $THREAD_CNT native
 done
 
 # Preserve the current values of the env variables
@@ -33,11 +32,9 @@ export PYTHONPATH=$GRAMINE_SGX_INSTALL_DIR/lib/python3.10/site-packages:$CURR_PY
 export PKG_CONFIG_PATH=$GRAMINE_SGX_INSTALL_DIR/lib/x86_64-linux-gnu/pkgconfig:$CURR_PKG_CONFIG_PATH
 make clean && make SGX=1
 for THREAD_CNT in "${THREADS[@]}"; do
-  export OMP_NUM_THREADS=$THREAD_CNT
   numactl --cpunodebind=0 --membind=0 gramine-direct ./pytorch pytorchexample.py $THREAD_CNT bm-gramine-direct
 done
 for THREAD_CNT in "${THREADS[@]}"; do
-  export OMP_NUM_THREADS=$THREAD_CNT
   numactl --cpunodebind=0 --membind=0 gramine-sgx ./pytorch pytorchexample.py $THREAD_CNT bm-gramine-sgx
 done
 
@@ -49,12 +46,10 @@ export PKG_CONFIG_PATH=$GRAMINE_TDX_INSTALL_DIR/lib/x86_64-linux-gnu/pkgconfig:$
 make clean && make SGX=1
 for THREAD_CNT in "${THREADS[@]}"; do
   export QEMU_CPU_NUM=$THREAD_CNT
-  export OMP_NUM_THREADS=$THREAD_CNT
   numactl --cpunodebind=0 --membind=0 gramine-vm ./pytorch pytorchexample.py $THREAD_CNT gramine-vm
 done
 for THREAD_CNT in "${THREADS[@]}"; do
   export QEMU_CPU_NUM=$THREAD_CNT
-  export OMP_NUM_THREADS=$THREAD_CNT
   numactl --cpunodebind=0 --membind=0 gramine-tdx ./pytorch pytorchexample.py $THREAD_CNT gramine-tdx
 done
 

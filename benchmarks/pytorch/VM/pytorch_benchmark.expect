@@ -34,8 +34,6 @@ expect "# "
 send -- "cd /root/examples/pytorch\r"
 #Expect the cd to be done
 expect "# "
-send -- "export OMP_NUM_THREADS=$cores\r"
-expect "# "
 if { $vm_type == "sgx" } {
   #run both the gramine-sgx and gramine-direct variants
   send -- "gramine-direct ./pytorch pytorchexample.py $cores vm-gramine-direct\r"
