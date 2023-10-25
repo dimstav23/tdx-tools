@@ -4,7 +4,7 @@ set -e
 
 THIS_DIR=$(dirname "$(readlink -f "$0")")
 DEPS_DIR=$THIS_DIR/deps
-EXAMPLES_PATCH=$THIS_DIR/../gramine_examples.patch
+PYTORCH_PATCH=$THIS_DIR/../../pytorch/pytorch_examples.patch
 
 # Create the directory for the dependencies
 mkdir -p $DEPS_DIR
@@ -61,7 +61,7 @@ else
   ninja -C build-release/ install
 fi
 
-# Download the gramine-examples, their dependencies and apply the patch
+# Download the gramine-examples, their dependencies and apply the patches
 sudo apt install libnss-mdns libnss-myhostname -y
 sudo apt install python3-pip lsb-release -y
 pip3 install torchvision pillow
@@ -73,7 +73,7 @@ else
   git clone https://github.com/gramineproject/examples.git
   cd $DEPS_DIR/examples
   git checkout v1.5
-  git apply $EXAMPLES_PATCH
+  git apply $PYTORCH_PATCH
 fi
 echo "Building pytorch example"
 # Set-up paths for the gramine installation directory

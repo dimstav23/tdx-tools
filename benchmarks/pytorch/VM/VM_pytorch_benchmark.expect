@@ -16,9 +16,9 @@ set epc_memory [lindex $argv 3];
 
 #Start the guest VM
 if { $vm_type == "sgx" } {
-  spawn sudo numactl --cpunodebind=0 --membind=0 $curr_dir/../../../start-qemu.sh -i $curr_dir/td-guest-ubuntu-22.04.qcow2 -k $curr_dir/vmlinuz -t $vm_type -b direct -c $cores -g $memory -u $epc_memory
+  spawn sudo numactl --cpunodebind=0 --membind=0 $curr_dir/../../../start-qemu.sh -i $curr_dir/../../common/VM/td-guest-ubuntu-22.04.qcow2 -k $curr_dir/../../common/VM/vmlinuz -t $vm_type -b direct -c $cores -g $memory -u $epc_memory
 } else {
-  spawn sudo numactl --cpunodebind=0 --membind=0 $curr_dir/../../../start-qemu.sh -i $curr_dir/td-guest-ubuntu-22.04.qcow2 -k $curr_dir/vmlinuz -t $vm_type -b direct -c $cores -g $memory 
+  spawn sudo numactl --cpunodebind=0 --membind=0 $curr_dir/../../../start-qemu.sh -i $curr_dir/../../common/VM/td-guest-ubuntu-22.04.qcow2 -k $curr_dir/../../common/VM/vmlinuz -t $vm_type -b direct -c $cores -g $memory 
 }
 #Login process
 expect "login: "

@@ -12,6 +12,6 @@ cpus=(1 2 4 6 8 12 16 20 24 32)
 
 for vm in "${vm_types[@]}"; do
   for cpu in "${cpus[@]}"; do
-    $THIS_DIR/pytorch_benchmark.expect $vm $cpu $vm_mem $epc_mem
+    $THIS_DIR/VM_pytorch_benchmark.expect $vm $cpu $vm_mem $epc_mem
   done
 done

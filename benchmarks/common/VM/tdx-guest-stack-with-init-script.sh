@@ -38,7 +38,7 @@ use the default tdx-guest-stack.sh script"
 fi
 
 if [[ ! -d ${REPO_LOCAL} ]] ; then
-    echo "${REPO_LOCAL} does not exist, please build it via ../build-repo.sh"
+    echo "${REPO_LOCAL} does not exist, please build it via ../../../build/ubuntu-22.04/build-repo.sh"
     exit 1
 fi
 
@@ -71,8 +71,8 @@ ARGS+=" --run-command 'ssh-keygen -A'"
 ARGS+=" --run-command 'dpkg -i /srv/${REPO_NAME}/linux-*.deb'"
 ARGS+=" --run-command 'systemctl mask pollinate.service'"
 
-# Copy the gramine examples patch
-ARGS+=" --copy-in ${THIS_DIR}/../gramine_examples.patch:/root/"
+# Copy the gramine examples patches
+ARGS+=" --copy-in ${THIS_DIR}/../../pytorch/pytorch_examples.patch:/root/"
 
 # Copy the init script and run it after the initial guest setup
 ARGS+=" --copy-in ${INIT_SCRIPT}:/root/"

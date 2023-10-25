@@ -21,12 +21,14 @@ ninja -C build/
 ninja -C build/ install
 export PATH="/usr/local/bin/:$PATH" # to identify the gramine binaries
 
-#Setup the pytorch example
+#Get the Gramine examples
 cd /root
 git clone https://github.com/gramineproject/examples.git
 cd /root/examples
 git checkout v1.5
-git apply /root/gramine_examples.patch
+
+#Setup the pytorch example
+git apply /root/pytorch_examples.patch
 apt install libnss-mdns libnss-myhostname -y
 apt install python3-pip lsb-release -y
 pip3 install torchvision pillow
