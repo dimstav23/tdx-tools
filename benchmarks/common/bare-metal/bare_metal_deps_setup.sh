@@ -4,7 +4,8 @@ set -e
 
 THIS_DIR=$(dirname "$(readlink -f "$0")")
 DEPS_DIR=$THIS_DIR/deps
-PYTORCH_PATCH=$THIS_DIR/../../pytorch/pytorch_examples.patch
+PYTORCH_PATCH=$THIS_DIR/../../pytorch/pytorch_benchmark.patch
+BLENDER_PATCH=$THIS_DIR/../../blender/blender_benchmark.patch
 
 # Create the directory for the dependencies
 mkdir -p $DEPS_DIR
@@ -37,6 +38,10 @@ else
   -Ddirect=enabled -Dsgx=enabled --prefix=$PWD/build-release
   ninja -C build-release/
   ninja -C build-release/ install
+  # Apply the benchmark patches in the CI-Examples
+  # blender
+  echo "Patching blender..."
+  git apply $BLENDER_PATCH
 fi
 
 # Download, build and install gramine-tdx
@@ -47,8 +52,9 @@ else
   echo "Cloning Gramine-TDX"
   git clone https://github.com/intel-sandbox/dkuvaisk.gramine-tdx.git
 fi
+
 cd $DEPS_DIR/dkuvaisk.gramine-tdx
-git checkout 78c2af00dca5eccdd190836c21c7065b11bf2c8b
+# git checkout 78c2af00dca5eccdd190836c21c7065b11bf2c8b
 if [ -d "build-release" ]; then
   echo "Gramine-TDX build-release directory already exists"
   echo "Skipping Gramine-TDX build & install phase"
@@ -75,7 +81,7 @@ else
   git checkout v1.5
   git apply $PYTORCH_PATCH
 fi
-echo "Building pytorch example"
+
 # Set-up paths for the gramine installation directory
 export PATH=$DEPS_DIR/gramine/build-release/bin:$PATH
 export PYTHONPATH=$DEPS_DIR/gramine/build-release/lib/python3.10/site-packages:$PYTHONPATH

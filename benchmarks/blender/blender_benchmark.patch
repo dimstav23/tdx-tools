@@ -1,0 +1,61 @@
+diff --git a/CI-Examples/blender/Makefile b/CI-Examples/blender/Makefile
+index 17831aee..6a255a47 100644
+--- a/CI-Examples/blender/Makefile
++++ b/CI-Examples/blender/Makefile
+@@ -63,7 +63,7 @@ $(DATA_DIR)/images:
+ 
+ .PHONY: check
+ check: all
+-	cd $(RUN_DIR) && DATA_DIR=$(DATA_DIR) sh $(PWD)/test_all_scenes.sh
++	cd $(RUN_DIR) && DATA_DIR=$(DATA_DIR) sh $(PWD)/test_all_scenes.sh $(VARIANT) $(THREADS)
+ 
+ .PHONY: clean
+ clean:
+diff --git a/CI-Examples/blender/blender.manifest.template b/CI-Examples/blender/blender.manifest.template
+index 14c8bb05..018e9354 100644
+--- a/CI-Examples/blender/blender.manifest.template
++++ b/CI-Examples/blender/blender.manifest.template
+@@ -23,8 +23,8 @@ fs.mounts = [
+ sgx.debug = true
+ sgx.edmm_enable = {{ 'true' if env.get('EDMM', '0') == '1' else 'false' }}
+ sys.stack.size = "8M"
+-sgx.enclave_size = "2048M"
+-sgx.max_threads = 64
++sgx.enclave_size = "4G"
++sgx.max_threads = 512
+ 
+ sgx.trusted_files = [
+   "file:{{ gramine.libos }}",
+diff --git a/CI-Examples/blender/test_all_scenes.sh b/CI-Examples/blender/test_all_scenes.sh
+index de087906..a2520890 100755
+--- a/CI-Examples/blender/test_all_scenes.sh
++++ b/CI-Examples/blender/test_all_scenes.sh
+@@ -2,6 +2,9 @@
+ 
+ set -e
+ 
++VARIANT=$1
++THREADS=$2
++
+ if test -n "$SGX"
+ then
+     GRAMINE=gramine-sgx
+@@ -9,10 +12,17 @@ else
+     GRAMINE=gramine-direct
+ fi
+ 
++if [ "$VARIANT" = "gramine-tdx" ]; then
++    GRAMINE=gramine-tdx
++elif [ "$VARIANT" = "gramine-vm" ]; then
++    GRAMINE=gramine-vm
++fi
++
+ for i in `ls "$DATA_DIR"/scenes/`;
+ do
+     rm -f "$DATA_DIR"/images/"$i"0001.png
+-    $GRAMINE "../blender" -b /data/scenes/$i -t 4 -F PNG -o /data/images/$i -f 1
++    $GRAMINE "../blender" -b /data/scenes/$i -t $THREADS -F PNG -o /data/images/$i -f 1 \
++        | grep "Saving" | tee ../results/"$VARIANT"_"$THREADS"_threads.txt
+     # TODO add a better test, probably some diff with a precomputed image
+     [ -f "$DATA_DIR"/images/"$i"0001.png ]
+ done

@@ -71,8 +71,9 @@ ARGS+=" --run-command 'ssh-keygen -A'"
 ARGS+=" --run-command 'dpkg -i /srv/${REPO_NAME}/linux-*.deb'"
 ARGS+=" --run-command 'systemctl mask pollinate.service'"
 
-# Copy the gramine examples patches
-ARGS+=" --copy-in ${THIS_DIR}/../../pytorch/pytorch_examples.patch:/root/"
+# Copy the gramine patches
+ARGS+=" --copy-in ${THIS_DIR}/../../pytorch/pytorch_benchmark.patch:/root/"
+ARGS+=" --copy-in ${THIS_DIR}/../../blender/blender_benchmark.patch:/root/"
 
 # Copy the init script and run it after the initial guest setup
 ARGS+=" --copy-in ${INIT_SCRIPT}:/root/"
