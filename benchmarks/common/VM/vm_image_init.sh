@@ -10,27 +10,26 @@ apt install meson python3-tomli python3-tomli-w -y
 apt install libprotobuf-c-dev protobuf-c-compiler protobuf-compiler -y
 apt install python3-cryptography python3-pip python3-protobuf -y
 
+#Fetch the git URLs and the stable-commits
+. /root/stable-commits
+
 #Build and install gramine
 cd /root
-git clone https://github.com/gramineproject/gramine.git
+git clone ${GRAMINE_GIT_URL}
 cd /root/gramine
-git checkout v1.5
+git checkout ${GRAMINE_COMMIT}
 meson setup build/ --buildtype=release -Ddirect=enabled -Dsgx=enabled
 ninja -C build/
 ninja -C build/ install
-# Apply the benchmark patches in the CI-Examples and build them (if needed)
-# blender
-apt install libxi6 libxxf86vm1 libxfixes3 libxrender1 -y
-git apply /root/blender_benchmark.patch
-mkdir -p /root/gramine/CI-Examples/blender/results
 
 export PATH="/usr/local/bin/:$PATH" # to identify the gramine binaries
+gramine-sgx-gen-private-key
 
 #Get the Gramine examples
 cd /root
-git clone https://github.com/gramineproject/examples.git
+git clone ${GRAMINE_EXAMPLES_GIT_URL}
 cd /root/examples
-git checkout v1.5
+git checkout ${GRAMINE_EXAMPLES_COMMIT}
 
 #Setup the pytorch example
 git apply /root/pytorch_benchmark.patch
@@ -40,5 +39,13 @@ pip3 install torchvision pillow
 cd /root/examples/pytorch
 mkdir results
 python3 download-pretrained-model.py
-gramine-sgx-gen-private-key
 make SGX=1
+
+# Apply the benchmark patches in the CI-Examples and build them (if needed)
+# blender
+apt install libxi6 libxxf86vm1 libxfixes3 libxrender1 -y
+cd /root/gramine
+git apply /root/blender_benchmark.patch
+mkdir -p /root/gramine/CI-Examples/blender/results
+cd /root/gramine/CI-Examples/blender
+make

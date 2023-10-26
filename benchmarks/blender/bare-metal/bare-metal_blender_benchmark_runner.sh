@@ -17,7 +17,7 @@ pushd $BENCHMARK_DIR
 mkdir -p results
 
 # Run the native case
-make clean && make # build blender
+make clean
 for THREAD_CNT in "${THREADS[@]}"; do
   # Manual blender execution
   rm -f ./data/images/simple_scene.blend0001.png

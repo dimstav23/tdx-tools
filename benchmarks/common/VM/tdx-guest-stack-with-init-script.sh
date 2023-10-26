@@ -71,6 +71,9 @@ ARGS+=" --run-command 'ssh-keygen -A'"
 ARGS+=" --run-command 'dpkg -i /srv/${REPO_NAME}/linux-*.deb'"
 ARGS+=" --run-command 'systemctl mask pollinate.service'"
 
+# Copy the stable-commits file
+ARGS+=" --copy-in ${THIS_DIR}/../stable-commits:/root/"
+
 # Copy the gramine patches
 ARGS+=" --copy-in ${THIS_DIR}/../../pytorch/pytorch_benchmark.patch:/root/"
 ARGS+=" --copy-in ${THIS_DIR}/../../blender/blender_benchmark.patch:/root/"

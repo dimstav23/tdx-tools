@@ -1,0 +1,15 @@
+#
+# Repos/Branches/Commits for benchmark automation framework
+#
+
+# gramine commit
+GRAMINE_GIT_URL="https://github.com/gramineproject/gramine.git"
+GRAMINE_COMMIT="2adc7d9bf22c0cb915657972bc49ddb653bda73d"
+
+# gramine-tdx commit
+GRAMINE_TDX_GIT_URL="https://github.com/intel-sandbox/dkuvaisk.gramine-tdx.git"
+GRAMINE_TDX_COMMIT="885c5018a094d281a7d67c0bd9f35d6f20225f96"
+
+# gramine examples commit
+GRAMINE_EXAMPLES_GIT_URL="https://github.com/gramineproject/examples.git"
+GRAMINE_EXAMPLES_COMMIT="957f0617e1ada4489874d33f620ff0f82ef3aadb"
