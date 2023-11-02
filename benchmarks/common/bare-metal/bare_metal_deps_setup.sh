@@ -6,6 +6,8 @@ THIS_DIR=$(dirname "$(readlink -f "$0")")
 DEPS_DIR=$THIS_DIR/deps
 PYTORCH_PATCH=$THIS_DIR/../../pytorch/pytorch_benchmark.patch
 BLENDER_PATCH=$THIS_DIR/../../blender/blender_benchmark.patch
+REDIS_PATCH=$THIS_DIR/../../redis/redis_benchmark.patch
+MEMCACHED_PATCH=$THIS_DIR/../../memcached/memcached_benchmark.patch
 
 # Fetch the git URLs and the stable-commits
 . ${THIS_DIR}/../stable-commits
@@ -34,6 +36,10 @@ else
   # Apply the patches for the CI-Examples
   echo "Patching blender..."
   git apply $BLENDER_PATCH
+  echo "Patching redis..."
+  git apply $REDIS_PATCH
+  echo "Patching memcached..."
+  git apply $MEMCACHED_PATCH
 fi
 
 cd $DEPS_DIR/gramine
@@ -110,3 +116,10 @@ fi
 sudo apt install libxi6 libxxf86vm1 libxfixes3 libxrender1 -y
 cd $DEPS_DIR/gramine/CI-Examples/blender
 make
+# redis
+cd $DEPS_DIR/gramine/CI-Examples/redis
+make SGX=1
+# memcached
+sudo apt install libevent-dev -y
+cd $DEPS_DIR/gramine/CI-Examples/memcached
+make SGX=1

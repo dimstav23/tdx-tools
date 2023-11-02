@@ -49,3 +49,16 @@ git apply /root/blender_benchmark.patch
 mkdir -p /root/gramine/CI-Examples/blender/results
 cd /root/gramine/CI-Examples/blender
 make
+# redis
+cd /root/gramine
+git apply /root/redis_benchmark.patch
+mkdir -p /root/gramine/CI-Examples/redis/results
+cd /root/gramine/CI-Examples/redis
+make SGX=1
+# memcached
+apt install libevent-dev -y
+cd /root/gramine
+git apply /root/memcached_benchmark.patch
+mkdir -p /root/gramine/CI-Examples/memcached/results
+cd /root/gramine/CI-Examples/memcached
+make SGX=1

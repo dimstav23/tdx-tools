@@ -77,11 +77,13 @@ ARGS+=" --copy-in ${THIS_DIR}/../stable-commits:/root/"
 # Copy the gramine patches
 ARGS+=" --copy-in ${THIS_DIR}/../../pytorch/pytorch_benchmark.patch:/root/"
 ARGS+=" --copy-in ${THIS_DIR}/../../blender/blender_benchmark.patch:/root/"
+ARGS+=" --copy-in ${THIS_DIR}/../../redis/redis_benchmark.patch:/root/"
+ARGS+=" --copy-in ${THIS_DIR}/../../memcached/memcached_benchmark.patch:/root/"
 
 # Copy the init script and run it after the initial guest setup
 ARGS+=" --copy-in ${INIT_SCRIPT}:/root/"
 ARGS+=" --memsize 4096" # to avoid running out of memory during the init script exec
-ARGS+=" --smp 16" # provide 16 cores for the run scripts to use
+ARGS+=" --smp 32" # provide 16 cores for the run scripts to use
 ARGS+=" --run-command '/root/${INIT_SCRIPT}'"
 
 echo "${ARGS}"
