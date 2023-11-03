@@ -62,3 +62,13 @@ git apply /root/memcached_benchmark.patch
 mkdir -p /root/gramine/CI-Examples/memcached/results
 cd /root/gramine/CI-Examples/memcached
 make SGX=1
+# sqlite
+apt install sqlite3 -y
+cd /root/gramine
+git apply /root/sqlite_benchmark.patch
+mkdir -p /root/gramine/CI-Examples/sqlite/results
+cd /root/gramine/CI-Examples/sqlite
+mv /root/sqlite3.c  ./
+mv /root/sqlite3.h  ./
+mv /root/kvtest.c   ./
+make SGX=1

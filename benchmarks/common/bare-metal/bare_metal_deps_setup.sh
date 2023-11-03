@@ -8,6 +8,7 @@ PYTORCH_PATCH=$THIS_DIR/../../pytorch/pytorch_benchmark.patch
 BLENDER_PATCH=$THIS_DIR/../../blender/blender_benchmark.patch
 REDIS_PATCH=$THIS_DIR/../../redis/redis_benchmark.patch
 MEMCACHED_PATCH=$THIS_DIR/../../memcached/memcached_benchmark.patch
+SQLITE_PATCH=$THIS_DIR/../../sqlite/sqlite_benchmark.patch
 
 # Fetch the git URLs and the stable-commits
 . ${THIS_DIR}/../stable-commits
@@ -40,6 +41,8 @@ else
   git apply $REDIS_PATCH
   echo "Patching memcached..."
   git apply $MEMCACHED_PATCH
+  echo "Patching sqlite..."
+  git apply $SQLITE_PATCH
 fi
 
 cd $DEPS_DIR/gramine
@@ -123,3 +126,24 @@ make SGX=1
 sudo apt install libevent-dev -y
 cd $DEPS_DIR/gramine/CI-Examples/memcached
 make SGX=1
+# sqlite
+sudo apt install sqlite3 -y
+cd $DEPS_DIR
+if [ -d "sqlite" ]; then
+  echo "SQLite directory already exists -- skip cloning"
+else
+  echo "Cloning SQLite"
+  git clone ${SQLITE_GIT_URL}
+  cd $DEPS_DIR/sqlite
+  git checkout ${SQLITE_COMMIT}
+  mkdir build
+  cd build
+  ../configure
+  make sqlite3.c # build the SQLite amalgamation
+fi
+# copy the sqlite3.c, sqlite3.h and kvtest.c files to the benchmark folder
+cp $DEPS_DIR/sqlite/build/sqlite3.c $DEPS_DIR/gramine/CI-Examples/sqlite/
+cp $DEPS_DIR/sqlite/build/sqlite3.h $DEPS_DIR/gramine/CI-Examples/sqlite/
+cp $DEPS_DIR/sqlite/test/kvtest.c $DEPS_DIR/gramine/CI-Examples/sqlite/
+cd $DEPS_DIR/gramine/CI-Examples/sqlite
+# make SGX=1

@@ -13,3 +13,7 @@ GRAMINE_TDX_COMMIT="885c5018a094d281a7d67c0bd9f35d6f20225f96"
 # gramine examples commit
 GRAMINE_EXAMPLES_GIT_URL="https://github.com/gramineproject/examples.git"
 GRAMINE_EXAMPLES_COMMIT="957f0617e1ada4489874d33f620ff0f82ef3aadb"
+
+# SQLite commit -- depends on the package version
+SQLITE_GIT_URL="https://github.com/sqlite/sqlite.git"
+SQLITE_COMMIT="version-$(sqlite3 --version | cut -d" " -f 1)"

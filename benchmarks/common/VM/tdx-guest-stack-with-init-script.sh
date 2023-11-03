@@ -79,10 +79,16 @@ ARGS+=" --copy-in ${THIS_DIR}/../../pytorch/pytorch_benchmark.patch:/root/"
 ARGS+=" --copy-in ${THIS_DIR}/../../blender/blender_benchmark.patch:/root/"
 ARGS+=" --copy-in ${THIS_DIR}/../../redis/redis_benchmark.patch:/root/"
 ARGS+=" --copy-in ${THIS_DIR}/../../memcached/memcached_benchmark.patch:/root/"
+ARGS+=" --copy-in ${THIS_DIR}/../../sqlite/sqlite_benchmark.patch:/root/"
+
+# Copy misc files needed for the benchmarks
+ARGS+=" --copy-in ${THIS_DIR}/../bare-metal/deps/sqlite/build/sqlite3.c:/root/"
+ARGS+=" --copy-in ${THIS_DIR}/../bare-metal/deps/sqlite/build/sqlite3.h:/root/"
+ARGS+=" --copy-in ${THIS_DIR}/../bare-metal/deps/sqlite/test/kvtest.c:/root/"
 
 # Copy the init script and run it after the initial guest setup
 ARGS+=" --copy-in ${INIT_SCRIPT}:/root/"
-ARGS+=" --memsize 4096" # to avoid running out of memory during the init script exec
+ARGS+=" --memsize 16384" # to avoid running out of memory during the init script exec
 ARGS+=" --smp 32" # provide 16 cores for the run scripts to use
 ARGS+=" --run-command '/root/${INIT_SCRIPT}'"
 
