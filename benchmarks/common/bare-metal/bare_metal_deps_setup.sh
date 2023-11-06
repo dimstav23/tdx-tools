@@ -9,6 +9,7 @@ BLENDER_PATCH=$THIS_DIR/../../blender/blender_benchmark.patch
 REDIS_PATCH=$THIS_DIR/../../redis/redis_benchmark.patch
 MEMCACHED_PATCH=$THIS_DIR/../../memcached/memcached_benchmark.patch
 SQLITE_PATCH=$THIS_DIR/../../sqlite/sqlite_benchmark.patch
+SQLITE_TMPFS_PATCH=$THIS_DIR/../../sqlite-tmpfs/sqlite-tmpfs_benchmark.patch
 
 # Fetch the git URLs and the stable-commits
 . ${THIS_DIR}/../stable-commits
@@ -35,13 +36,30 @@ else
   cd $DEPS_DIR/gramine
   git checkout ${GRAMINE_COMMIT}
   # Apply the patches for the CI-Examples
+  # Blender
   echo "Patching blender..."
+  cd $DEPS_DIR/gramine/CI-Examples/blender
   git apply $BLENDER_PATCH
+  # Redis
   echo "Patching redis..."
+  cd $DEPS_DIR/gramine/CI-Examples/redis
   git apply $REDIS_PATCH
+  # Memcached
   echo "Patching memcached..."
+  cd $DEPS_DIR/gramine/CI-Examples/memcached
   git apply $MEMCACHED_PATCH
+  # Sqlite tmpfs
+  echo "Patching sqlite for tmpfs variant..."
+  cd $DEPS_DIR/gramine/CI-Examples/sqlite
+  git apply ${SQLITE_TMPFS_PATCH}
+  echo "Copying sqlite for sqlite-tmpfs variant..."
+  cp -r $DEPS_DIR/gramine/CI-Examples/sqlite $DEPS_DIR/gramine/CI-Examples/sqlite-tmpfs
+  # Sqlite
+  echo "Checking out sqlite Makefile and manifest.template..."
+  cd $DEPS_DIR/gramine/CI-Examples/sqlite
+  git checkout Makefile manifest.template
   echo "Patching sqlite..."
+  cd $DEPS_DIR/gramine/CI-Examples/sqlite
   git apply $SQLITE_PATCH
 fi
 
@@ -141,9 +159,10 @@ else
   ../configure
   make sqlite3.c # build the SQLite amalgamation
 fi
-# copy the sqlite3.c, sqlite3.h and kvtest.c files to the benchmark folder
+# copy the sqlite3.c, sqlite3.h and kvtest.c files to the benchmark folders
+# Note: the kvtest.c version for the sqlite-tmpfs is included in the sqlite-tmpfs patch
 cp $DEPS_DIR/sqlite/build/sqlite3.c $DEPS_DIR/gramine/CI-Examples/sqlite/
 cp $DEPS_DIR/sqlite/build/sqlite3.h $DEPS_DIR/gramine/CI-Examples/sqlite/
 cp $DEPS_DIR/sqlite/test/kvtest.c $DEPS_DIR/gramine/CI-Examples/sqlite/
-cd $DEPS_DIR/gramine/CI-Examples/sqlite
-# make SGX=1
+cp $DEPS_DIR/sqlite/build/sqlite3.c $DEPS_DIR/gramine/CI-Examples/sqlite-tmpfs/
+cp $DEPS_DIR/sqlite/build/sqlite3.h $DEPS_DIR/gramine/CI-Examples/sqlite-tmpfs/

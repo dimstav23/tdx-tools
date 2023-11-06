@@ -49,12 +49,14 @@ git apply /root/blender_benchmark.patch
 mkdir -p /root/gramine/CI-Examples/blender/results
 cd /root/gramine/CI-Examples/blender
 make
+
 # redis
 cd /root/gramine
 git apply /root/redis_benchmark.patch
 mkdir -p /root/gramine/CI-Examples/redis/results
 cd /root/gramine/CI-Examples/redis
 make SGX=1
+
 # memcached
 apt install libevent-dev -y
 cd /root/gramine
@@ -62,12 +64,24 @@ git apply /root/memcached_benchmark.patch
 mkdir -p /root/gramine/CI-Examples/memcached/results
 cd /root/gramine/CI-Examples/memcached
 make SGX=1
+
+# sqlite-tmpfs
+cd /root/gramine/CI-Examples/sqlite
+git apply /root/sqlite-tmpfs_benchmark.patch
+cp -r /root/gramine/CI-Examples/sqlite /root/gramine/CI-Examples/sqlite-tmpfs
+mkdir -p /root/gramine/CI-Examples/sqlite-tmpfs/results
+cd /root/gramine/CI-Examples/sqlite-tmpfs
+cp /root/sqlite3.c  ./
+cp /root/sqlite3.h  ./
+# Note: kvtest.c is imported from the sqlite-tmpfs patch
+make SGX=1
+
 # sqlite
 apt install sqlite3 -y
-cd /root/gramine
+cd /root/gramine/CI-Examples/sqlite
+git checkout Makefile manifest.template # modified by the sqlite-tmpfs patch
 git apply /root/sqlite_benchmark.patch
 mkdir -p /root/gramine/CI-Examples/sqlite/results
-cd /root/gramine/CI-Examples/sqlite
 mv /root/sqlite3.c  ./
 mv /root/sqlite3.h  ./
 mv /root/kvtest.c   ./
