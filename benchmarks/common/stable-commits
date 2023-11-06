@@ -16,4 +16,5 @@ GRAMINE_EXAMPLES_COMMIT="957f0617e1ada4489874d33f620ff0f82ef3aadb"
 
 # SQLite commit -- depends on the package version
 SQLITE_GIT_URL="https://github.com/sqlite/sqlite.git"
-SQLITE_COMMIT="version-$(sqlite3 --version | cut -d" " -f 1)"
+SQLITE_COMMIT="version-3.37.2"
+# SQLITE_COMMIT="version-$(sqlite3 --version | cut -d" " -f 1)"
