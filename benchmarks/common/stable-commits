@@ -8,7 +8,7 @@ GRAMINE_COMMIT="2adc7d9bf22c0cb915657972bc49ddb653bda73d"
 
 # gramine-tdx commit
 GRAMINE_TDX_GIT_URL="https://github.com/intel-sandbox/dkuvaisk.gramine-tdx.git"
-GRAMINE_TDX_COMMIT="3ec9711bb750e7bc7d2c616cfb24e91d5f8fc76f"
+GRAMINE_TDX_COMMIT="2ac47c05a7985663442044077c2359b5154a967c"
 
 # gramine examples commit
 GRAMINE_EXAMPLES_GIT_URL="https://github.com/gramineproject/examples.git"
