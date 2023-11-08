@@ -42,9 +42,12 @@ python3 download-pretrained-model.py
 make SGX=1
 
 # Setup the openvino example
+sudo apt install libsm6 libxext6 libgl1 -y
 sudo apt install cmake python3 python3-venv -y
 cd /root/examples
 git apply /root/openvino_benchmark.patch
+cd /root/examples/openvino
+mkdir results
 python3 -m venv openvino_env
 source openvino_env/bin/activate
 python -m pip install --upgrade pip
