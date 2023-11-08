@@ -10,6 +10,7 @@ REDIS_PATCH=$THIS_DIR/../../redis/redis_benchmark.patch
 MEMCACHED_PATCH=$THIS_DIR/../../memcached/memcached_benchmark.patch
 SQLITE_PATCH=$THIS_DIR/../../sqlite/sqlite_benchmark.patch
 SQLITE_TMPFS_PATCH=$THIS_DIR/../../sqlite-tmpfs/sqlite-tmpfs_benchmark.patch
+OPENVINO_PATCH=$THIS_DIR/../../openvino/openvino_benchmark.patch
 
 # Fetch the git URLs and the stable-commits
 . ${THIS_DIR}/../stable-commits
@@ -119,7 +120,15 @@ else
   git clone ${GRAMINE_EXAMPLES_GIT_URL}
   cd $DEPS_DIR/examples
   git checkout ${GRAMINE_EXAMPLES_COMMIT}
+
+  # pytorch
+  echo "Patching pytorch..."
   git apply $PYTORCH_PATCH
+
+  # openvino
+  echo "Patching openvino..."
+  git apply $OPENVINO_PATCH
+
 fi
 
 # Setup pytorch example
@@ -131,6 +140,16 @@ if ! [ -f "alexnet-pretrained.pt" ]; then
   echo "Downloading the pre-trained model"
   python3 download-pretrained-model.py
 fi
+
+# Setup openvino example
+cd $DEPS_DIR/examples/openvino
+sudo apt install cmake python3 python3-venv -y
+python3 -m venv openvino_env
+source openvino_env/bin/activate
+python -m pip install --upgrade pip
+pip install openvino-dev[tensorflow,mxnet]==2022.3.1
+deactivate
+make SGX=1
 
 # Build the CI-Examples (if needed)
 # blender

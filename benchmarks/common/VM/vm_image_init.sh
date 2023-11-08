@@ -41,6 +41,17 @@ mkdir results
 python3 download-pretrained-model.py
 make SGX=1
 
+# Setup the openvino example
+sudo apt install cmake python3 python3-venv -y
+cd /root/examples
+git apply /root/openvino_benchmark.patch
+python3 -m venv openvino_env
+source openvino_env/bin/activate
+python -m pip install --upgrade pip
+pip install openvino-dev[tensorflow,mxnet]==2022.3.1
+deactivate
+make SGX=1
+
 # Apply the benchmark patches in the CI-Examples and build them (if needed)
 # blender
 apt install libxi6 libxxf86vm1 libxfixes3 libxrender1 -y

@@ -81,6 +81,7 @@ ARGS+=" --copy-in ${THIS_DIR}/../../redis/redis_benchmark.patch:/root/"
 ARGS+=" --copy-in ${THIS_DIR}/../../memcached/memcached_benchmark.patch:/root/"
 ARGS+=" --copy-in ${THIS_DIR}/../../sqlite/sqlite_benchmark.patch:/root/"
 ARGS+=" --copy-in ${THIS_DIR}/../../sqlite-tmpfs/sqlite-tmpfs_benchmark.patch:/root/"
+ARGS+=" --copy-in ${THIS_DIR}/../../openvino/openvino_benchmark.patch:/root/"
 
 # Copy misc files needed for the benchmarks
 ARGS+=" --copy-in ${THIS_DIR}/../bare-metal/deps/sqlite/build/sqlite3.c:/root/"
