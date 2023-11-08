@@ -11,6 +11,7 @@ MEMCACHED_PATCH=$THIS_DIR/../../memcached/memcached_benchmark.patch
 SQLITE_PATCH=$THIS_DIR/../../sqlite/sqlite_benchmark.patch
 SQLITE_TMPFS_PATCH=$THIS_DIR/../../sqlite-tmpfs/sqlite-tmpfs_benchmark.patch
 OPENVINO_PATCH=$THIS_DIR/../../openvino/openvino_benchmark.patch
+PYTHON_PATCH=$THIS_DIR/../../python/python_benchmark.patch
 
 # Fetch the git URLs and the stable-commits
 . ${THIS_DIR}/../stable-commits
@@ -62,6 +63,10 @@ else
   echo "Patching sqlite..."
   cd $DEPS_DIR/gramine/CI-Examples/sqlite
   git apply $SQLITE_PATCH
+  # Python
+  echo "Patching python..."
+  cd $DEPS_DIR/gramine/CI-Examples/python
+  git apply $PYTHON_PATCH
 fi
 
 cd $DEPS_DIR/gramine
@@ -185,3 +190,7 @@ cp $DEPS_DIR/sqlite/build/sqlite3.h $DEPS_DIR/gramine/CI-Examples/sqlite/
 cp $DEPS_DIR/sqlite/test/kvtest.c $DEPS_DIR/gramine/CI-Examples/sqlite/
 cp $DEPS_DIR/sqlite/build/sqlite3.c $DEPS_DIR/gramine/CI-Examples/sqlite-tmpfs/
 cp $DEPS_DIR/sqlite/build/sqlite3.h $DEPS_DIR/gramine/CI-Examples/sqlite-tmpfs/
+# python
+sudo apt install libnss-mdns python3-numpy python3-scipy -y
+cd $DEPS_DIR/gramine/CI-Examples/python
+make SGX=1

@@ -100,3 +100,11 @@ mv /root/sqlite3.c  ./
 mv /root/sqlite3.h  ./
 mv /root/kvtest.c   ./
 make SGX=1
+
+# python
+apt install libnss-mdns python3-numpy python3-scipy -y
+cd /root/gramine
+git apply /root/python_benchmark.patch
+mkdir -p /root/gramine/CI-Examples/python/results
+cd /root/gramine/CI-Examples/python
+make SGX=1

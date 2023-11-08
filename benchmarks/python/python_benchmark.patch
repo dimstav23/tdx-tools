@@ -1,0 +1,56 @@
+diff --git a/CI-Examples/python/python.manifest.template b/CI-Examples/python/python.manifest.template
+index b26898b1..08247054 100644
+--- a/CI-Examples/python/python.manifest.template
++++ b/CI-Examples/python/python.manifest.template
+@@ -10,7 +10,10 @@ loader.env.LD_LIBRARY_PATH = "/lib:/lib:{{ arch_libdir }}:/usr/{{ arch_libdir }}
+ # Python's NumPy spawns as many threads as there are CPU cores, and each thread
+ # consumes a chunk of memory, so on large machines 1G enclave size may be not enough.
+ # We limit the number of spawned threads via OMP_NUM_THREADS env variable.
+-loader.env.OMP_NUM_THREADS = "4"
++loader.env.OMP_NUM_THREADS = { passthrough = true }
++# Similarly with the scipy via the OPENBLAS_NUM_THREADS
++loader.env.OPENBLAS_NUM_THREADS = { passthrough = true }
++loader.env.QEMU_CPU_NUM = { passthrough = true }
+ 
+ loader.insecure__use_cmdline_argv = true
+ 
+diff --git a/CI-Examples/python/scripts/test-numpy.py b/CI-Examples/python/scripts/test-numpy.py
+index 5c25eb3b..0595362f 100644
+--- a/CI-Examples/python/scripts/test-numpy.py
++++ b/CI-Examples/python/scripts/test-numpy.py
+@@ -14,7 +14,7 @@ print("numpy version: " + numpy.__version__)
+ x = numpy.random.random((1000, 1000))
+ 
+ setup = "import numpy; x = numpy.random.random((1000, 1000))"
+-count = 5
++count = 1000
+ 
+ t = timeit.Timer("numpy.dot(x, x.T)", setup=setup)
+ print("numpy.dot: " + str(t.timeit(count)/count) + " sec")
+diff --git a/CI-Examples/python/scripts/test-scipy.py b/CI-Examples/python/scripts/test-scipy.py
+index de57ee6a..67b05813 100644
+--- a/CI-Examples/python/scripts/test-scipy.py
++++ b/CI-Examples/python/scripts/test-scipy.py
+@@ -5,13 +5,16 @@ import timeit
+ setup = """\
+ import numpy
+ import scipy.linalg as linalg
+-x = numpy.random.random((100,100))
++import scipy.fft as fft
++x = numpy.random.random((1000,1000))
+ z = numpy.dot(x, x.T)
+ """
+-count = 5
+ 
+-t = timeit.Timer("linalg.cholesky(z, lower=True)", setup=setup)
+-print("linalg.cholesky: " + str(t.timeit(count)/count) + "sec")
++count = 1000
++t = timeit.Timer("fft.fft2(z)", setup=setup)
++print("fft.fft2: " + str(t.timeit(count)/count) + " sec")
+ 
++# Reduce the count as it takes a lot of time to run otherwise
++count = 100
+ t = timeit.Timer("linalg.svd(z)", setup=setup)
+-print("linalg.svd: " + str(t.timeit(count)/count) + "sec")
++print("linalg.svd: " + str(t.timeit(count)/count) + " sec")
+\ No newline at end of file
