@@ -55,7 +55,7 @@ fi
 cp $CLOUD_IMG $TD_IMG
 
 virt-customize -a ${TD_IMG} --root-password password:123456
-qemu-img resize ${TD_IMG} +20G
+qemu-img resize ${TD_IMG} +30G
 
 ARGS=" -a ${TD_IMG} -x"
 
