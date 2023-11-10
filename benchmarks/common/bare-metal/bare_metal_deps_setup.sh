@@ -12,6 +12,8 @@ SQLITE_PATCH=$THIS_DIR/../../sqlite/sqlite_benchmark.patch
 SQLITE_TMPFS_PATCH=$THIS_DIR/../../sqlite-tmpfs/sqlite-tmpfs_benchmark.patch
 OPENVINO_PATCH=$THIS_DIR/../../openvino/openvino_benchmark.patch
 PYTHON_PATCH=$THIS_DIR/../../python/python_benchmark.patch
+TF_MAKEFILE=$THIS_DIR/../../tensorflow/Makefile
+TF_MANIFEST_TEMPLATE=$THIS_DIR/../../tensorflow/python.manifest.template
 
 # Fetch the git URLs and the stable-commits
 . ${THIS_DIR}/../stable-commits
@@ -134,6 +136,11 @@ else
   echo "Patching openvino..."
   git apply $OPENVINO_PATCH
 
+  # tensorflow
+  echo "Setting up tensorflow..."
+  mkdir -p tensorflow
+  cp $TF_MAKEFILE ./
+  cp $TF_MANIFEST_TEMPLATE ./
 fi
 
 # Setup pytorch example
@@ -154,6 +161,15 @@ source openvino_env/bin/activate
 python -m pip install --upgrade pip
 pip install openvino-dev[tensorflow,mxnet]==2022.3.1
 deactivate
+make SGX=1
+
+# Setup tensorflow example
+cd $DEPS_DIR/examples/tensorflow
+sudo apt install python3-pip -y
+pip install tensorflow
+pip install psutil pandas
+pip install future --user
+make install-dependencies-ubuntu
 make SGX=1
 
 # Build the CI-Examples (if needed)

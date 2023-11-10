@@ -42,8 +42,8 @@ python3 download-pretrained-model.py
 make SGX=1
 
 # Setup the openvino example
-sudo apt install libsm6 libxext6 libgl1 -y
-sudo apt install cmake python3 python3-venv -y
+apt install libsm6 libxext6 libgl1 -y
+apt install cmake python3 python3-venv -y
 cd /root/examples
 git apply /root/openvino_benchmark.patch
 cd /root/examples/openvino
@@ -53,6 +53,17 @@ source openvino_env/bin/activate
 python -m pip install --upgrade pip
 pip install openvino-dev[tensorflow,mxnet]==2022.3.1
 deactivate
+make SGX=1
+
+# Setup the tensorflow example
+apt install python3-pip -y
+pip install tensorflow
+pip install psutil pandas
+pip install future --user
+cd /root/examples/tensorflow
+cp /root/Makefile ./
+cp /root/python.manifest.template ./
+make install_dependencies_ubuntu
 make SGX=1
 
 # Apply the benchmark patches in the CI-Examples and build them (if needed)
@@ -102,7 +113,7 @@ mv /root/kvtest.c   ./
 make SGX=1
 
 # python
-apt install libnss-mdns python3-numpy python3-scipy -y
+apt install libnss-mdns python3-numpy python3-scipy python-is-python3 -y
 cd /root/gramine
 git apply /root/python_benchmark.patch
 mkdir -p /root/gramine/CI-Examples/python/results

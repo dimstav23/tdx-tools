@@ -85,6 +85,8 @@ ARGS+=" --copy-in ${THIS_DIR}/../../openvino/openvino_benchmark.patch:/root/"
 ARGS+=" --copy-in ${THIS_DIR}/../../python/python_benchmark.patch:/root/"
 
 # Copy misc files needed for the benchmarks
+ARGS+=" --copy-in ${THIS_DIR}/../bare-metal/deps/tensorflow/Makefile:/root/"
+ARGS+=" --copy-in ${THIS_DIR}/../bare-metal/deps/tensorflow/python.manifest.template:/root/"
 ARGS+=" --copy-in ${THIS_DIR}/../bare-metal/deps/sqlite/build/sqlite3.c:/root/"
 ARGS+=" --copy-in ${THIS_DIR}/../bare-metal/deps/sqlite/build/sqlite3.h:/root/"
 ARGS+=" --copy-in ${THIS_DIR}/../bare-metal/deps/sqlite/test/kvtest.c:/root/"
