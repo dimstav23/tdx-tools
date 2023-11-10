@@ -63,18 +63,18 @@ for THREAD_CNT in "${THREADS[@]}"; do
   export OMP_NUM_THREADS=$THREAD_CNT
   export OPENBLAS_NUM_THREADS=$THREAD_CNT
   numactl --cpunodebind=0 --membind=0 gramine-vm python scripts/test-numpy.py \
-  | tail -n 2 | tee ./results/numpy_bm-gramine-vm_"$THREAD_CNT"_threads.txt
+  | tail -n 2 | tee ./results/numpy_gramine-vm_"$THREAD_CNT"_threads.txt
   numactl --cpunodebind=0 --membind=0 gramine-vm python scripts/test-scipy.py \
-  | tail -n 4 | tee ./results/scipy_bm-gramine-vm_"$THREAD_CNT"_threads.txt
+  | tail -n 4 | tee ./results/scipy_gramine-vm_"$THREAD_CNT"_threads.txt
 done
 for THREAD_CNT in "${THREADS[@]}"; do
   export QEMU_CPU_NUM=$THREAD_CNT
   export OMP_NUM_THREADS=$THREAD_CNT
   export OPENBLAS_NUM_THREADS=$THREAD_CNT
   numactl --cpunodebind=0 --membind=0 gramine-tdx python scripts/test-numpy.py \
-  | tail -n 2 | tee ./results/numpy_bm-gramine-tdx_"$THREAD_CNT"_threads.txt
+  | tail -n 2 | tee ./results/numpy_gramine-tdx_"$THREAD_CNT"_threads.txt
   numactl --cpunodebind=0 --membind=0 gramine-tdx python scripts/test-scipy.py \
-  | tail -n 4 | tee ./results/scipy_bm-gramine-tdx_"$THREAD_CNT"_threads.txt
+  | tail -n 4 | tee ./results/scipy_gramine-tdx_"$THREAD_CNT"_threads.txt
 done
 
 mkdir -p $RESULTS_DIR

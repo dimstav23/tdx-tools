@@ -55,10 +55,10 @@ if { $vm_type == "gramine-direct" || $vm_type == "gramine-sgx" } {
   send -- "numactl --cpunodebind=0 --membind=0 ${vm_type} python scripts/test-scipy.py \
   | tail -n 4 | tee ./results/scipy_vm-${vm_type}_${cores}_threads.txt\r"
 } else {
-  send -- "numactl --cpunodebind=0 --membind=0 python scripts/test-numpy.py \
+  send -- "numactl --cpunodebind=0 --membind=0 python3 scripts/test-numpy.py \
   | tail -n 2 | tee ./results/numpy_${vm_type}_${cores}_threads.txt\r"
   expect -- "# "
-  send -- "numactl --cpunodebind=0 --membind=0 python scripts/test-scipy.py \
+  send -- "numactl --cpunodebind=0 --membind=0 python3 scripts/test-scipy.py \
   | tail -n 4 | tee ./results/scipy_${vm_type}_${cores}_threads.txt\r"
 }
 
