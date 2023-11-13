@@ -55,7 +55,7 @@ fi
 cp $CLOUD_IMG $TD_IMG
 
 virt-customize -a ${TD_IMG} --root-password password:123456
-qemu-img resize ${TD_IMG} +30G
+qemu-img resize ${TD_IMG} +40G
 
 ARGS=" -a ${TD_IMG} -x"
 
@@ -85,8 +85,8 @@ ARGS+=" --copy-in ${THIS_DIR}/../../openvino/openvino_benchmark.patch:/root/"
 ARGS+=" --copy-in ${THIS_DIR}/../../python/python_benchmark.patch:/root/"
 
 # Copy misc files needed for the benchmarks
-ARGS+=" --copy-in ${THIS_DIR}/../bare-metal/deps/tensorflow/Makefile:/root/"
-ARGS+=" --copy-in ${THIS_DIR}/../bare-metal/deps/tensorflow/python.manifest.template:/root/"
+ARGS+=" --copy-in ${THIS_DIR}/../bare-metal/deps/examples/tensorflow/Makefile:/root/"
+ARGS+=" --copy-in ${THIS_DIR}/../bare-metal/deps/examples/tensorflow/python.manifest.template:/root/"
 ARGS+=" --copy-in ${THIS_DIR}/../bare-metal/deps/sqlite/build/sqlite3.c:/root/"
 ARGS+=" --copy-in ${THIS_DIR}/../bare-metal/deps/sqlite/build/sqlite3.h:/root/"
 ARGS+=" --copy-in ${THIS_DIR}/../bare-metal/deps/sqlite/test/kvtest.c:/root/"

@@ -60,10 +60,12 @@ apt install python3-pip -y
 pip install tensorflow
 pip install psutil pandas
 pip install future --user
+mkdir -p /root/examples/tensorflow
 cd /root/examples/tensorflow
+mkdir -p results
 cp /root/Makefile ./
 cp /root/python.manifest.template ./
-make install_dependencies_ubuntu
+make install-dependencies-ubuntu
 make SGX=1
 
 # Apply the benchmark patches in the CI-Examples and build them (if needed)

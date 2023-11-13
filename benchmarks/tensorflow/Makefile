@@ -1,7 +1,8 @@
 # SPDX-License-Identifier: LGPL-3.0-or-later
 
 ARCH_LIBDIR ?= /lib/$(shell $(CC) -dumpmachine)
-PYTHON_DIST_DIR ?= $(shell python -m site --user-site)
+PYTHON_VERSION = $(shell python -c 'import sys; print(".".join(map(str,sys.version_info[:2])))')
+PYTHON_DIST_DIR = /usr/local/lib/python$(PYTHON_VERSION)/dist-packages
 
 ifeq ($(DEBUG),1)
 GRAMINE_LOG_LEVEL = debug
