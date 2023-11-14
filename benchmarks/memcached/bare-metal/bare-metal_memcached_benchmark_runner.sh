@@ -79,21 +79,11 @@ CURR_PATH=$PATH
 CURR_PYTHONPATH=$PYTHONPATH
 CURR_PKG_CONFIG_PATH=$PKG_CONFIG_PATH
 
-# Run the bare-metal (bm) gramine-direct and gramine-sgx case
+# Run the bare-metal (bm) gramine-sgx case
 export PATH=$GRAMINE_SGX_INSTALL_DIR/bin:$CURR_PATH
 export PYTHONPATH=$GRAMINE_SGX_INSTALL_DIR/lib/python3.10/site-packages:$CURR_PYTHONPATH
 export PKG_CONFIG_PATH=$GRAMINE_SGX_INSTALL_DIR/lib/x86_64-linux-gnu/pkgconfig:$CURR_PKG_CONFIG_PATH
 make clean && make SGX=1
-for THREAD_CNT in "${THREADS[@]}"; do
-  run_memcached 11211 $THREAD_CNT "gramine-direct"
-  run_memtier 11211 bm-gramine-direct $THREAD_CNT
-  cleanup 11211 11212
-
-  run_memcached 11212 $THREAD_CNT "gramine-direct"
-  run_socat TCP 11211 11212
-  run_memtier 11211 bm-socat-gramine-direct $THREAD_CNT
-  cleanup 11211 11212
-done
 for THREAD_CNT in "${THREADS[@]}"; do
   run_memcached 11211 $THREAD_CNT "gramine-sgx"
   run_memtier 11211 bm-gramine-sgx $THREAD_CNT

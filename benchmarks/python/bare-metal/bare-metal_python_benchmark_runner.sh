@@ -31,19 +31,11 @@ CURR_PATH=$PATH
 CURR_PYTHONPATH=$PYTHONPATH
 CURR_PKG_CONFIG_PATH=$PKG_CONFIG_PATH
 
-# Run the bare-metal (bm) gramine-direct and gramine-sgx case
+# Run the bare-metal (bm) gramine-sgx case
 export PATH=$GRAMINE_SGX_INSTALL_DIR/bin:$CURR_PATH
 export PYTHONPATH=$GRAMINE_SGX_INSTALL_DIR/lib/python3.10/site-packages:$CURR_PYTHONPATH
 export PKG_CONFIG_PATH=$GRAMINE_SGX_INSTALL_DIR/lib/x86_64-linux-gnu/pkgconfig:$CURR_PKG_CONFIG_PATH
 make clean && make SGX=1
-for THREAD_CNT in "${THREADS[@]}"; do
-  export OMP_NUM_THREADS=$THREAD_CNT
-  export OPENBLAS_NUM_THREADS=$THREAD_CNT
-  numactl --cpunodebind=0 --membind=0 gramine-direct python scripts/test-numpy.py \
-  | tail -n 2 | tee ./results/numpy_bm-gramine-direct_"$THREAD_CNT"_threads.txt
-  numactl --cpunodebind=0 --membind=0 gramine-direct python scripts/test-scipy.py \
-  | tail -n 4 | tee ./results/scipy_bm-gramine-direct_"$THREAD_CNT"_threads.txt
-done
 for THREAD_CNT in "${THREADS[@]}"; do
   export OMP_NUM_THREADS=$THREAD_CNT
   export OPENBLAS_NUM_THREADS=$THREAD_CNT

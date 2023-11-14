@@ -26,14 +26,11 @@ CURR_PATH=$PATH
 CURR_PYTHONPATH=$PYTHONPATH
 CURR_PKG_CONFIG_PATH=$PKG_CONFIG_PATH
 
-# Run the bare-metal (bm) gramine-direct and gramine-sgx case
+# Run the bare-metal (bm) gramine-sgx case
 export PATH=$GRAMINE_SGX_INSTALL_DIR/bin:$CURR_PATH
 export PYTHONPATH=$GRAMINE_SGX_INSTALL_DIR/lib/python3.10/site-packages:$CURR_PYTHONPATH
 export PKG_CONFIG_PATH=$GRAMINE_SGX_INSTALL_DIR/lib/x86_64-linux-gnu/pkgconfig:$CURR_PKG_CONFIG_PATH
 make clean && make SGX=1
-for THREAD_CNT in "${THREADS[@]}"; do
-  numactl --cpunodebind=0 --membind=0 gramine-direct ./pytorch pytorchexample.py $THREAD_CNT bm-gramine-direct
-done
 for THREAD_CNT in "${THREADS[@]}"; do
   numactl --cpunodebind=0 --membind=0 gramine-sgx ./pytorch pytorchexample.py $THREAD_CNT bm-gramine-sgx
 done

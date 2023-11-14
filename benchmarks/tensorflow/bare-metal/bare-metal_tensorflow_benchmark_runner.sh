@@ -54,41 +54,11 @@ CURR_PATH=$PATH
 CURR_PYTHONPATH=$PYTHONPATH
 CURR_PKG_CONFIG_PATH=$PKG_CONFIG_PATH
 
-# Run the bare-metal (bm) gramine-direct and gramine-sgx case
+# Run the bare-metal (bm) gramine-sgx case
 export PATH=$GRAMINE_SGX_INSTALL_DIR/bin:$CURR_PATH
 export PYTHONPATH=$GRAMINE_SGX_INSTALL_DIR/lib/python3.10/site-packages:$CURR_PYTHONPATH
 export PKG_CONFIG_PATH=$GRAMINE_SGX_INSTALL_DIR/lib/x86_64-linux-gnu/pkgconfig:$CURR_PKG_CONFIG_PATH
 make clean && make SGX=1
-for THREAD_CNT in "${THREADS[@]}"; do
-  OMP_NUM_THREADS=$THREAD_CNT KMP_AFFINITY=granularity=fine,verbose,compact,1,0 \
-  numactl --cpunodebind=0 --membind=0 gramine-direct python \
-  models/models/language_modeling/tensorflow/bert_large/inference/run_squad.py \
-  --init_checkpoint=data/bert_large_checkpoints/model.ckpt-3649 \
-  --vocab_file=data/wwm_uncased_L-24_H-1024_A-16/vocab.txt \
-  --bert_config_file=data/wwm_uncased_L-24_H-1024_A-16/bert_config.json \
-  --predict_file=data/wwm_uncased_L-24_H-1024_A-16/dev-v1.1.json \
-  --precision=int8 --output_dir=output/bert-squad-output \
-  --predict_batch_size=32 \
-  --experimental_gelu=True \
-  --optimized_softmax=True \
-  --input_graph=data/fp32_bert_squad.pb \
-  --do_predict=True \
-  --mode=benchmark \
-  --inter_op_parallelism_threads=1 \
-  --intra_op_parallelism_threads=$THREAD_CNT \
-  | tail -n 4 | tee ./results/Bert_bm-gramine-direct_"$THREAD_CNT"_threads.txt
-  
-  OMP_NUM_THREADS=$THREAD_CNT KMP_AFFINITY=granularity=fine,verbose,compact,1,0 \
-  numactl --cpunodebind=0 --membind=0 gramine-direct python \
-  models/models/image_recognition/tensorflow/resnet50v1_5/inference/cpu/eval_image_classifier_inference.py \
-  --input-graph=data/resnet50v1_5_int8_pretrained_model.pb \
-  --num-inter-threads=1 \
-  --num-intra-threads=$THREAD_CNT \
-  --batch-size=512 \
-  --warmup-steps=50 \
-  --steps=500 \
-  | tail -n 4 | tee ./results/RN50_bm-gramine-direct_"$THREAD_CNT"_threads.txt
-done
 for THREAD_CNT in "${THREADS[@]}"; do
   OMP_NUM_THREADS=$THREAD_CNT KMP_AFFINITY=granularity=fine,verbose,compact,1,0 \
   numactl --cpunodebind=0 --membind=0 gramine-sgx python \

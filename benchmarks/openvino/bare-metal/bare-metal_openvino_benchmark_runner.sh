@@ -42,26 +42,11 @@ CURR_PATH=$PATH
 CURR_PYTHONPATH=$PYTHONPATH
 CURR_PKG_CONFIG_PATH=$PKG_CONFIG_PATH
 
-# Run the bare-metal (bm) gramine-direct and gramine-sgx case
+# Run the bare-metal (bm) gramine-sgx case
 export PATH=$GRAMINE_SGX_INSTALL_DIR/bin:$CURR_PATH
 export PYTHONPATH=$GRAMINE_SGX_INSTALL_DIR/lib/python3.10/site-packages:$CURR_PYTHONPATH
 export PKG_CONFIG_PATH=$GRAMINE_SGX_INSTALL_DIR/lib/x86_64-linux-gnu/pkgconfig:$CURR_PKG_CONFIG_PATH
 make clean && make SGX=1
-for THREAD_CNT in "${THREADS[@]}"; do
-  KMP_AFFINITY=granularity=fine,noverbose,compact,1,0 numactl --cpubind=0 --membind=0 \
-    gramine-direct benchmark_app \
-    -m model/public/resnet-50-tf/FP16/resnet-50-tf.xml \
-    -d CPU -b 1 -t $EXPERIMENT_TIME -hint none \
-    -nstreams $THREAD_CNT -nthreads $THREAD_CNT -nireq $THREAD_CNT \
-  | tail -n 10 | tee ./results/RN50_bm-gramine-direct_"$THREAD_CNT"_threads.txt
-
-  KMP_AFFINITY=granularity=fine,noverbose,compact,1,0 numactl --cpubind=0 --membind=0 \
-    gramine-direct benchmark_app \
-    -m model/intel/bert-large-uncased-whole-word-masking-squad-int8-0001/FP16-INT8/bert-large-uncased-whole-word-masking-squad-int8-0001.xml \
-    -d CPU -b 1 -t $EXPERIMENT_TIME -hint none \
-    -nstreams $THREAD_CNT -nthreads $THREAD_CNT -nireq $THREAD_CNT \
-  | tail -n 10 | tee ./results/Bert_bm-gramine-direct_"$THREAD_CNT"_threads.txt
-done
 for THREAD_CNT in "${THREADS[@]}"; do
   KMP_AFFINITY=granularity=fine,noverbose,compact,1,0 numactl --cpubind=0 --membind=0 \
     gramine-sgx benchmark_app \
