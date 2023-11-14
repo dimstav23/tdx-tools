@@ -8,7 +8,7 @@ THIS_DIR=$(dirname "$(readlink -f "$0")")
 vm_mem="32G" # VM memory
 epc_mem="32G" # EPC memory for the VM (only used for sgx)
 vm_types=("td" "efi" "gramine-direct" "gramine-sgx")
-cpus=(1 2 4 6 8 12 16 20 24 32)
+cpus=(1 2 4 8 16 32)
 
 for vm in "${vm_types[@]}"; do
   for cpu in "${cpus[@]}"; do

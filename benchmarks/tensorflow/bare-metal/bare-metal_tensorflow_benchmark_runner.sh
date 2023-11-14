@@ -9,7 +9,7 @@ GRAMINE_SGX_INSTALL_DIR=$DEPS_DIR/gramine/build-release
 GRAMINE_TDX_INSTALL_DIR=$DEPS_DIR/dkuvaisk.gramine-tdx/build-release
 BENCHMARK_DIR=$DEPS_DIR/examples/tensorflow
 
-THREADS=(1 2 4 6 8 12 16 20 24 32)
+THREADS=(1 2 4 8 16 32)
 
 pushd $BENCHMARK_DIR
 
@@ -90,7 +90,7 @@ for THREAD_CNT in "${THREADS[@]}"; do
   | tail -n 4 | tee ./results/RN50_bm-gramine-direct_"$THREAD_CNT"_threads.txt
 done
 for THREAD_CNT in "${THREADS[@]}"; do
-    OMP_NUM_THREADS=$THREAD_CNT KMP_AFFINITY=granularity=fine,verbose,compact,1,0 \
+  OMP_NUM_THREADS=$THREAD_CNT KMP_AFFINITY=granularity=fine,verbose,compact,1,0 \
   numactl --cpunodebind=0 --membind=0 gramine-sgx python \
   models/models/language_modeling/tensorflow/bert_large/inference/run_squad.py \
   --init_checkpoint=data/bert_large_checkpoints/model.ckpt-3649 \

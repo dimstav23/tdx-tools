@@ -9,7 +9,7 @@ GRAMINE_SGX_INSTALL_DIR=$DEPS_DIR/gramine/build-release
 GRAMINE_TDX_INSTALL_DIR=$DEPS_DIR/dkuvaisk.gramine-tdx/build-release
 BENCHMARK_DIR=$DEPS_DIR/gramine/CI-Examples/memcached
 
-THREADS=(1 2 4 6 8 12 16 20 24 32)
+THREADS=(1 2 4 8 16 32)
 
 BIND0="numactl --cpunodebind=0 --membind=0"
 BIND1="numactl --cpunodebind=1 --membind=1"
