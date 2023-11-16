@@ -87,16 +87,6 @@ export PYTHONPATH=$GRAMINE_SGX_INSTALL_DIR/lib/python3.10/site-packages:$CURR_PY
 export PKG_CONFIG_PATH=$GRAMINE_SGX_INSTALL_DIR/lib/x86_64-linux-gnu/pkgconfig:$CURR_PKG_CONFIG_PATH
 make clean && make SGX=1
 for THREAD_CNT in "${THREADS[@]}"; do
-  run_redis "gramine-direct"
-  run_memtier $REDIS_PORT bm-gramine-direct $THREAD_CNT
-  cleanup
-
-  run_redis "gramine-direct"
-  run_socat TCP
-  run_memtier $FWD_PORT bm-socat-gramine-direct $THREAD_CNT
-  cleanup
-done
-for THREAD_CNT in "${THREADS[@]}"; do
   run_redis "gramine-sgx"
   run_memtier $REDIS_PORT bm-gramine-sgx $THREAD_CNT
   cleanup
