@@ -56,7 +56,8 @@ deactivate
 make SGX=1
 
 # Setup the tensorflow example
-apt install python3-pip -y
+apt install unzip -y
+apt install python3-pip python-is-python3 -y
 pip install tensorflow
 pip install psutil pandas
 pip install future --user
@@ -65,6 +66,7 @@ cd /root/examples/tensorflow
 mkdir -p results
 cp /root/Makefile ./
 cp /root/python.manifest.template ./
+make distclean
 make install-dependencies-ubuntu
 make SGX=1
 
