@@ -12,6 +12,7 @@ SQLITE_PATCH=$THIS_DIR/../../sqlite/sqlite_benchmark.patch
 SQLITE_TMPFS_PATCH=$THIS_DIR/../../sqlite-tmpfs/sqlite-tmpfs_benchmark.patch
 OPENVINO_PATCH=$THIS_DIR/../../openvino/openvino_benchmark.patch
 PYTHON_PATCH=$THIS_DIR/../../python/python_benchmark.patch
+LIGHTTPD_PATCH=$THIS_DIR/../../lighttpd/lighttpd_benchmark.patch
 TF_MAKEFILE=$THIS_DIR/../../tensorflow/Makefile
 TF_MANIFEST_TEMPLATE=$THIS_DIR/../../tensorflow/python.manifest.template
 
@@ -69,6 +70,10 @@ else
   echo "Patching python..."
   cd $DEPS_DIR/gramine/CI-Examples/python
   git apply $PYTHON_PATCH
+  # lighttpd
+  echo "Patching lighttpd..."
+  cd $DEPS_DIR/gramine/CI-Examples/lighttpd
+  git apply $LIGHTTPD_PATCH
 fi
 
 cd $DEPS_DIR/gramine
@@ -209,4 +214,8 @@ cp $DEPS_DIR/sqlite/build/sqlite3.h $DEPS_DIR/gramine/CI-Examples/sqlite-tmpfs/
 # python
 sudo apt install libnss-mdns python3-numpy python3-scipy -y
 cd $DEPS_DIR/gramine/CI-Examples/python
+make SGX=1
+# lighttpd
+sudo apt install build-essential libssl-dev zlib1g-dev wrk -y
+cd $DEPS_DIR/gramine/CI-Examples/lighttpd
 make SGX=1

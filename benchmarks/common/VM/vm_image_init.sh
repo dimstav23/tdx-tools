@@ -123,3 +123,12 @@ git apply /root/python_benchmark.patch
 mkdir -p /root/gramine/CI-Examples/python/results
 cd /root/gramine/CI-Examples/python
 make SGX=1
+
+# lighttpd
+apt install build-essential libssl-dev zlib1g-dev libtool-bin wrk -y
+cd /root/gramine
+git apply /root/lighttpd_benchmark.patch
+mkdir -p /root/gramine/CI-Examples/lighttpd/results
+cd /root/gramine/CI-Examples/lighttpd
+make distclean
+make SGX=1
