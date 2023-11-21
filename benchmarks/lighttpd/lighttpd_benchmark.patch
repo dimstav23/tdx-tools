@@ -1,5 +1,5 @@
 diff --git a/CI-Examples/common_tools/benchmark-http.sh b/CI-Examples/common_tools/benchmark-http.sh
-index 38b9c5f7..39e3c0a0 100755
+index 38b9c5f7..5ad19142 100755
 --- a/CI-Examples/common_tools/benchmark-http.sh
 +++ b/CI-Examples/common_tools/benchmark-http.sh
 @@ -8,16 +8,14 @@
@@ -53,7 +53,7 @@ index 38b9c5f7..39e3c0a0 100755
 +            TOTAL_THROUGHPUTS[$CONCURRENCY]="${TOTAL_THROUGHPUTS[$CONCURRENCY]} $TOTAL_THROUGHPUT"
          fi
 -        echo "Run = $((RUN+1)) Concurrency = $CONCURRENCY Per thread Throughput (bytes) = $THROUGHPUT, Latency (ms) = $LATENCY"
-+        echo "Run = $((RUN+1)) Concurrency = $CONCURRENCY Per thread Throughput (bytes) = $THROUGHPUT, Latency (ms) = $LATENCY, Total Throughput (bytes) = $TOTAL_THROUGHPUT"
++        echo "Run = $((RUN+1)) Concurrency = $CONCURRENCY Per thread Throughput (reqs/sec) = $THROUGHPUT, Latency (ms) = $LATENCY, Total Throughput (reqs/sec) = $TOTAL_THROUGHPUT"
  
      done
      (( RUN++ ))
@@ -65,7 +65,7 @@ index 38b9c5f7..39e3c0a0 100755
      LATENCY=$(echo "${LATENCIES[$CONCURRENCY]}" | tr " " "\n" | sort -n | awk '{a[NR]=$0}END{if(NR%2==1)print a[(NR + 1)/2];else print (a[NR/2]+a[NR/2 + 1])/2}')
 -    printf "Concurrency = %3d: Per Thread Median Througput (bytes) = %9.3f, Latency (ms) = %9.3f\n" \
 -        "$CONCURRENCY" "$THROUGHPUT" "$LATENCY" | tee -a "$RESULT"
-+    printf "Concurrency = %3d: Per Thread Median Throughput (bytes) = %9.3f, Latency (ms) = %9.3f, Total Throughput (bytes) = %9.3f\n" \
++    printf "Concurrency = %3d: Per Thread Median Throughput (reqs/sec) = %9.3f, Latency (ms) = %9.3f, Total Throughput (reqs/sec) = %9.3f\n" \
 +        "$CONCURRENCY" "$THROUGHPUT" "$LATENCY" "$TOTAL_THROUGHPUT"
  done
 -
