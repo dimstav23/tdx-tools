@@ -69,8 +69,17 @@ set socat_id $spawn_id
 # Run the client benchmark
 # w/ socat
 sleep 5
-spawn /bin/sh -c "numactl --cpunodebind=0 --membind=0 $client_benchmark http://127.0.0.1:$fwd_port \
-                  | tail -n 6 | tee ${curr_dir}/../results/socat-${vm_type}_${cores}_threads.txt"
+spawn /bin/sh -c "DOWNLOAD_FILE=random/100.1.html numactl --cpunodebind=0 --membind=0 $client_benchmark \
+                  http://127.0.0.1:$fwd_port \
+                  | tail -n 6 | tee ${curr_dir}/../results/socat-${vm_type}_${cores}_threads_100.1.html.txt"
+expect -- "$ "
+spawn /bin/sh -c "DOWNLOAD_FILE=random/10K.1.html numactl --cpunodebind=0 --membind=0 $client_benchmark \
+                  http://127.0.0.1:$fwd_port \
+                  | tail -n 6 | tee ${curr_dir}/../results/socat-${vm_type}_${cores}_threads_10K.1.html.txt"
+expect -- "$ "
+spawn /bin/sh -c "DOWNLOAD_FILE=random/1M.1.html numactl --cpunodebind=0 --membind=0 $client_benchmark \
+                  http://127.0.0.1:$fwd_port \
+                  | tail -n 6 | tee ${curr_dir}/../results/socat-${vm_type}_${cores}_threads_1M.1.html.txt"
 expect -- "$ "
 
 # Close the socat process
@@ -78,8 +87,17 @@ close -i $socat_id
 
 # w/o socat
 sleep 5
-spawn /bin/sh -c "numactl --cpunodebind=0 --membind=0 $client_benchmark http://127.0.0.1:$lighttpd_port \
-                  | tail -n 6 | tee ${curr_dir}/../results/${vm_type}_${cores}_threads.txt"
+spawn /bin/sh -c "DOWNLOAD_FILE=random/100.1.html numactl --cpunodebind=0 --membind=0 $client_benchmark \
+                  http://127.0.0.1:$lighttpd_port \
+                  | tail -n 6 | tee ${curr_dir}/../results/${vm_type}_${cores}_threads_100.1.html.txt"
+expect -- "$ "
+spawn /bin/sh -c "DOWNLOAD_FILE=random/10K.1.html numactl --cpunodebind=0 --membind=0 $client_benchmark \
+                  http://127.0.0.1:$lighttpd_port \
+                  | tail -n 6 | tee ${curr_dir}/../results/${vm_type}_${cores}_threads_10K.1.html.txt"
+expect -- "$ "
+spawn /bin/sh -c "DOWNLOAD_FILE=random/1M.1.html numactl --cpunodebind=0 --membind=0 $client_benchmark \
+                  http://127.0.0.1:$lighttpd_port \
+                  | tail -n 6 | tee ${curr_dir}/../results/${vm_type}_${cores}_threads_1M.1.html.txt"
 expect -- "$ "
 
 # Cleanup phase

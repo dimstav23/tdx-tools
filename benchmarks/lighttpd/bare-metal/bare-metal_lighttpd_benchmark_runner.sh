@@ -56,8 +56,8 @@ function run_socat() {
 
 function run_benchmark() {
   echo "Running client benchmark..."
-  $BIND0 $CLIENT_BENCHMARK http://127.0.0.1:$1 \
-  | tail -n 6 | tee ./results/"$2"_"$3"_threads.txt
+  DOWNLOAD_FILE=random/$4 $BIND0 $CLIENT_BENCHMARK http://127.0.0.1:$1 \
+  | tail -n 6 | tee ./results/"$2"_"$3"_threads_$4.txt
 }
 
 function cleanup() {
@@ -74,12 +74,16 @@ function cleanup() {
 # Run the native case
 for THREAD_CNT in "${THREADS[@]}"; do
   run_lighttpd "native"
-  run_benchmark $LIGHTTPD_PORT native $THREAD_CNT
+  run_benchmark $LIGHTTPD_PORT native $THREAD_CNT "100.1.html"
+  run_benchmark $LIGHTTPD_PORT native $THREAD_CNT "10K.1.html"
+  run_benchmark $LIGHTTPD_PORT native $THREAD_CNT "1M.1.html"
   cleanup
 
   run_lighttpd "native"
   run_socat TCP
-  run_benchmark $FWD_PORT socat-native $THREAD_CNT
+  run_benchmark $FWD_PORT socat-native $THREAD_CNT "100.1.html"
+  run_benchmark $FWD_PORT socat-native $THREAD_CNT "10K.1.html"
+  run_benchmark $FWD_PORT socat-native $THREAD_CNT "1M.1.html"
   cleanup
 done
 
@@ -95,12 +99,16 @@ export PKG_CONFIG_PATH=$GRAMINE_SGX_INSTALL_DIR/lib/x86_64-linux-gnu/pkgconfig:$
 make clean && make SGX=1
 for THREAD_CNT in "${THREADS[@]}"; do
   run_lighttpd "gramine-sgx"
-  run_benchmark $LIGHTTPD_PORT bm-gramine-sgx $THREAD_CNT
+  run_benchmark $LIGHTTPD_PORT bm-gramine-sgx $THREAD_CNT "100.1.html"
+  run_benchmark $LIGHTTPD_PORT bm-gramine-sgx $THREAD_CNT "10K.1.html"
+  run_benchmark $LIGHTTPD_PORT bm-gramine-sgx $THREAD_CNT "1M.1.html"
   cleanup
 
   run_lighttpd "gramine-sgx"
   run_socat TCP
-  run_benchmark $FWD_PORT bm-socat-gramine-sgx $THREAD_CNT
+  run_benchmark $FWD_PORT bm-socat-gramine-sgx $THREAD_CNT "100.1.html"
+  run_benchmark $FWD_PORT bm-socat-gramine-sgx $THREAD_CNT "10K.1.html"
+  run_benchmark $FWD_PORT bm-socat-gramine-sgx $THREAD_CNT "1M.1.html"
   cleanup
 done
 
@@ -115,7 +123,9 @@ for THREAD_CNT in "${THREADS[@]}"; do
   sleep 10
   run_socat VSOCK
   sleep 5
-  run_benchmark $FWD_PORT gramine-vm $THREAD_CNT
+  run_benchmark $FWD_PORT gramine-vm $THREAD_CNT "100.1.html"
+  run_benchmark $FWD_PORT gramine-vm $THREAD_CNT "10K.1.html"
+  run_benchmark $FWD_PORT gramine-vm $THREAD_CNT "1M.1.html"
   cleanup
   sleep 30
 done
@@ -125,7 +135,9 @@ for THREAD_CNT in "${THREADS[@]}"; do
   sleep 10
   run_socat VSOCK
   sleep 5
-  run_benchmark $FWD_PORT gramine-tdx $THREAD_CNT
+  run_benchmark $FWD_PORT gramine-tdx $THREAD_CNT "100.1.html"
+  run_benchmark $FWD_PORT gramine-tdx $THREAD_CNT "10K.1.html"
+  run_benchmark $FWD_PORT gramine-tdx $THREAD_CNT "1M.1.html"
   cleanup
   sleep 30
 done
