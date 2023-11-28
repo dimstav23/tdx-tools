@@ -104,11 +104,12 @@ export PYTHONPATH=$GRAMINE_TDX_INSTALL_DIR/lib/python3.10/site-packages:$CURR_PY
 export PKG_CONFIG_PATH=$GRAMINE_TDX_INSTALL_DIR/lib/x86_64-linux-gnu/pkgconfig:$CURR_PKG_CONFIG_PATH
 make clean && make SGX=1
 for THREAD_CNT in "${THREADS[@]}"; do
+  echo "Running gramine-vm with $THREAD_CNT Thread(s)"
   export QEMU_CPU_NUM=$THREAD_CNT
-
+  
   OMP_NUM_THREADS=$THREAD_CNT KMP_AFFINITY=granularity=fine,verbose,compact,1,0 \
   numactl --cpunodebind=0 --membind=0 \
-  taskset -a -c 0-$((THREAD_CNT-1))) \
+  taskset -a -c 0-$((THREAD_CNT-1)) \
   gramine-vm python \
   models/models/language_modeling/tensorflow/bert_large/inference/run_squad.py \
   --init_checkpoint=data/bert_large_checkpoints/model.ckpt-3649 \
@@ -125,7 +126,7 @@ for THREAD_CNT in "${THREADS[@]}"; do
   --inter_op_parallelism_threads=1 \
   --intra_op_parallelism_threads=$THREAD_CNT \
   | tail -n 4 | tee ./results/Bert_gramine-vm_"$THREAD_CNT"_threads.txt
-  
+
   OMP_NUM_THREADS=$THREAD_CNT KMP_AFFINITY=granularity=fine,verbose,compact,1,0 \
   numactl --cpunodebind=0 --membind=0 \
   taskset -a -c 0-$((THREAD_CNT-1)) \
