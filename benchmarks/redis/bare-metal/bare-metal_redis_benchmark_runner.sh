@@ -8,6 +8,7 @@ RESULTS_DIR=$THIS_DIR/../results
 GRAMINE_SGX_INSTALL_DIR=$DEPS_DIR/gramine/build-release
 GRAMINE_TDX_INSTALL_DIR=$DEPS_DIR/dkuvaisk.gramine-tdx/build-release
 BENCHMARK_DIR=$DEPS_DIR/gramine/CI-Examples/redis
+REDIS_BENCHMARK=$DEPS_DIR/gramine/CI-Examples/redis/src/src/redis-benchmark
 
 THREADS=(1) # redis is single threaded
 
@@ -50,7 +51,13 @@ function run_socat() {
 function run_memtier() {
   echo "Running memtier..."
   $BIND0 memtier_benchmark --port=$1 --protocol=redis --hide-histogram \
-  | tail -n 8 | tee ./results/"$2"_"$3"_threads.txt
+  | tail -n 8 | tee ./results/"$2"_memtier-benchmark_"$3"_threads.txt
+}
+
+function run_redis_benchmark() {
+  echo "Running redis benchmark..."
+  $BIND0 $REDIS_BENCHMARK -q -p $1 \
+  | tail -n 20 | tee ./results/"$2"_redis-benchmark_"$3"_threads.txt
 }
 
 function cleanup() {
@@ -68,11 +75,13 @@ function cleanup() {
 for THREAD_CNT in "${THREADS[@]}"; do
   run_redis ""
   run_memtier $REDIS_PORT native $THREAD_CNT
+  run_redis_benchmark $REDIS_PORT native $THREAD_CNT
   cleanup
 
   run_redis ""
   run_socat TCP
   run_memtier $FWD_PORT socat-native $THREAD_CNT
+  run_redis_benchmark $FWD_PORT socat-native $THREAD_CNT
   cleanup
 done
 
@@ -89,11 +98,13 @@ make clean && make SGX=1
 for THREAD_CNT in "${THREADS[@]}"; do
   run_redis "gramine-sgx"
   run_memtier $REDIS_PORT bm-gramine-sgx $THREAD_CNT
+  run_redis_benchmark $REDIS_PORT bm-gramine-sgx $THREAD_CNT
   cleanup
 
   run_redis "gramine-sgx"
   run_socat TCP
   run_memtier $FWD_PORT bm-socat-gramine-sgx $THREAD_CNT
+  run_redis_benchmark $FWD_PORT bm-socat-gramine-sgx $THREAD_CNT
   cleanup
 done
 
@@ -109,6 +120,7 @@ for THREAD_CNT in "${THREADS[@]}"; do
   run_socat VSOCK
   sleep 5
   run_memtier $FWD_PORT gramine-vm $THREAD_CNT
+  run_redis_benchmark $FWD_PORT gramine-vm $THREAD_CNT
   cleanup
   sleep 30
 done
@@ -119,6 +131,7 @@ for THREAD_CNT in "${THREADS[@]}"; do
   run_socat VSOCK
   sleep 5
   run_memtier $FWD_PORT gramine-tdx $THREAD_CNT
+  run_redis_benchmark $FWD_PORT gramine-tdx $THREAD_CNT
   cleanup
   sleep 30
 done
