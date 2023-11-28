@@ -58,9 +58,9 @@ for model in $models; do
     printf "\n" >> $csv_file
 
     if [[ $model == "Bert" ]]; then
-      printf "examples/sec," >> $csv_file
+      printf "Throughput (examples/sec)," >> $csv_file
     elif [[ $model == "RN50" ]]; then
-      printf "images/sec," >> $csv_file
+      printf "Throughput (images/sec)," >> $csv_file
     fi
 
     for thread in $thread_nums; do

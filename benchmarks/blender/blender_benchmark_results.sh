@@ -48,7 +48,7 @@ for vm_type in $vm_types; do
   truncate -s-1 $csv_file # remove last comma
   printf "\n" >> $csv_file
 
-  printf "Runtime(sec)," >> $csv_file
+  printf "Runtime (sec)," >> $csv_file
   for thread in $thread_nums; do
     key="$vm_type,$thread"
     if [ -n "${data[$key]}" ]; then

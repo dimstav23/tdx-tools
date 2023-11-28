@@ -52,7 +52,7 @@ for model in $models; do
     truncate -s-1 $csv_file # remove last comma
     printf "\n" >> $csv_file
 
-    printf "FPS," >> $csv_file
+    printf "Throughput (FPS)," >> $csv_file
     for thread in $thread_nums; do
       key="$model,$vm_type,$thread"
       if [ -n "${data[$key]}" ]; then

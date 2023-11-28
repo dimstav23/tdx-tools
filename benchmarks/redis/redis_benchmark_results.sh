@@ -52,7 +52,7 @@ for benchmark in $benchmarks; do
     truncate -s-1 $csv_file # remove last comma
     printf "\n" >> $csv_file
 
-    printf "ops/sec," >> $csv_file
+    printf "Throughput (ops/sec)," >> $csv_file
     for thread in $thread_nums; do
       key="$benchmark,$vm_type,$thread"
       if [ -n "${data[$key]}" ]; then
