@@ -8,13 +8,19 @@ variants_label_map = {
   "bm-gramine-sgx"        :   "Gramine-SGX",
   "gramine-tdx"           :   "Gramine-TDX",
   "gramine-vm"            :   "Gramine-VM",
+  "socat-efi"             :   "Normal VM w/ socat",
+  "socat-td"              :   "Intel TDX VM w/ socat"
 }
 
 class ResultsLoader:
   def __init__(self, directory):
     self.directory = directory
 
-  def load_data(self):
+  def filter_data(self, data, experiments_filter):
+    filtered_data = {k: v for k, v in data.items() if k in experiments_filter}
+    return filtered_data
+
+  def load_data(self, experiments_filter):
     data = {}
     files = [f for f in os.listdir(self.directory) if f.endswith('.csv')]
     
@@ -27,7 +33,7 @@ class ResultsLoader:
         experiment, variant = filename_parts
       else:
         experiment, variant = "default", filename_parts[0]
-      
+
       # Keep only the variant name
       variant = variant.split('.csv')[0]
       # Replace variant with its label
@@ -50,5 +56,8 @@ class ResultsLoader:
       if experiment not in data:
         data[experiment] = {}
       data[experiment][variant] = df
-
+    
+    if experiments_filter is not None:
+      data = self.filter_data(data, experiments_filter)
+    
     return data
