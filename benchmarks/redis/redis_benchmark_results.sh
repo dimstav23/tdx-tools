@@ -3,7 +3,7 @@
 set -e
 
 THIS_DIR=$(dirname "$(readlink -f "$0")")
-RESULTS_DIR=$THIS_DIR/results
+RESULTS_DIR=$THIS_DIR/results_plot_2
 
 # Organize the results
 declare -A data
@@ -18,19 +18,19 @@ for file in $RESULTS_DIR/*.txt; do
   if [[ $benchmark == "memtier-benchmark" ]]; then
     # sed to get the first occurence of {number}.{number} (floating point)
     throughput=$(cat "$file" | tail -n 1 | sed -E 's,^[^0-9]*([0-9]+.[0-9]+).*$,\1,')
+    data["$benchmark,$vm_type,$thread"]=$throughput
   elif [[ $benchmark == "redis-benchmark" ]]; then
-    # calculate the average throughput
-    sum=0
-    cnt=0
+    # extract the experiment name and its value
     while read -r line; do
-      val=$(echo "$line" | sed 's/.*://' | sed -E 's,^[^0-9]*([0-9]+.[0-9]+).*$,\1,')
-      sum=$(bc <<< "$sum + $val")
-      cnt=`expr $cnt + 1`
+      # get the redis-benchmark experiment name without the quotes and the parentheses
+      benchmark=$(echo "${line//'"'}" | cut -d',' -f1 | cut -d' ' -f1 | tr "_" "-")
+      # Just get 3 (GET, SET, LRANGE-300) experiments of redis-benchmarks
+      if [[ $benchmark == "GET" ]] || [[ $benchmark == "SET" ]] || [[ $benchmark == "LRANGE-300" ]]; then
+        throughput=$(echo "${line//'"'}" | cut -d',' -f2)
+        data["$benchmark,$vm_type,$thread"]=$throughput
+      fi
     done < <(head -n -1 $file) # ignore the last empty line
-    throughput=`echo "$sum / $cnt" | bc -l`
   fi
-  data["$benchmark,$vm_type,$thread"]=$throughput
-
   if [[ ${#vm_type} -gt max_vm_type_length ]]; then
     max_vm_type_length=${#vm_type}
   fi
