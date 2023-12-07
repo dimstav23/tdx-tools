@@ -56,7 +56,7 @@ function run_memtier() {
 
 function run_redis_benchmark() {
   echo "Running redis benchmark..."
-  $BIND0 $REDIS_BENCHMARK -q -p $1 \
+  $BIND0 $REDIS_BENCHMARK -q --csv -p $1 \
   | tail -n 20 | tee ./results/"$2"_redis-benchmark_"$3"_threads.txt
 }
 

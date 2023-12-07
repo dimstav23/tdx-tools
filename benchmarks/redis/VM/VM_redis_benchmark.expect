@@ -77,7 +77,7 @@ spawn /bin/sh -c "numactl --cpunodebind=0 --membind=0 memtier_benchmark --port=$
                   | tail -n 8 | tee ${curr_dir}/../results/socat-${vm_type}_memtier-benchmark_${cores}_threads.txt"
 expect -- "$ "
 
-spawn /bin/sh -c "numactl --cpunodebind=0 --membind=0 $redis_benchmark -p $fwd_port \
+spawn /bin/sh -c "numactl --cpunodebind=0 --membind=0 $redis_benchmark -q --csv -p $fwd_port \
                   | tail -n 20 | tee ${curr_dir}/../results/socat-${vm_type}_redis-benchmark_${cores}_threads.txt"
 expect -- "$ "
 
