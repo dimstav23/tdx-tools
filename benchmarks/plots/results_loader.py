@@ -57,7 +57,11 @@ class ResultsLoader:
         data[experiment] = {}
       data[experiment][variant] = df
     
-    if experiments_filter is not None:
-      data = self.filter_data(data, experiments_filter)
+    for experiment in experiments_filter:
+      if experiment not in data:
+        print(f"Error: Experiment {experiment} does not exist in {self.directory}")
+        exit()
+
+    data = self.filter_data(data, experiments_filter)
     
     return data

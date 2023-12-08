@@ -1,28 +1,77 @@
 import argparse
+import matplotlib.pyplot as plt
+import os
 from results_analyzer import ResultsAnalyzer
 
 def main():
   parser = argparse.ArgumentParser(description='Produce plots for Gramine-TDX.')
-  parser.add_argument('--directory', '-d', required=True, help='Directory containing CSV files.')
-  parser.add_argument('--app', '-a', required=True, help='Name of the application for the plot title.')
-  parser.add_argument('--type', '-t', default='individual', choices=['individual', 'group'],
-                      help='Choose the plot type. \
-                        Individual indicates that each experiment gets its own figure. \
-                        Group indicates that the plots are combined in a single figure.')
-  parser.add_argument('--annotation', '-n', default=None, choices=['absolute', 'overhead'], help='Annotation type')
-  parser.add_argument('--experiments', '-e', default=None, 
-                      help='Comma spearated list to choose specific experiments to plot -- case sensitive')
+  parser.add_argument('--directories', '-d', nargs='+', required=True, \
+                      help='List of directories containing CSV files.')
+  parser.add_argument('--apps', '-a', nargs='+', required=True, \
+                      help='List of the applications. 1-1 matching with the directories is required.')
+  parser.add_argument('--annotation', '-n', default=None, choices=['absolute', 'overhead'], \
+                      help='Annotation type')
+  parser.add_argument('--experiments', '-e', nargs='+', required=True, default=['default'], 
+                      help='List of comma spearated experiments for each app (case sensitive). 1-1 matching with directories and apps is required.')
   parser.add_argument('--xaxis', '-x', default='threads', choices=['threads', 'experiments'],
                       help='Choose x-axis type. Note that "experiments" type is only available for single-threaded results.')
-  parser.add_argument('--legend_loc', '-l', default=None,
+  parser.add_argument('--legend_loc', '-l', default="upper center",
                       help='Choose the location of the legend. Note that in case of a group plot, it applies to the first subplot.')
-
+  parser.add_argument('--output_dir', '-o', default='plots', \
+                      help='Directory to place the plot(s).')
+  parser.add_argument('--title', '-t', default='my_plot', \
+                      help='Plot title.')
   args = parser.parse_args()
 
-  print("Generating " + args.type + " plot for " + args.app + " with " + args.xaxis + " as x-axis")
-  analyzer = ResultsAnalyzer(args.directory, args.app, args.annotation, args.experiments)
-  analyzer.analyze()
-  analyzer.plot_results(args.type, args.xaxis, args.legend_loc)
+
+  # Sanity checks
+  if len(args.directories) != len(args.apps):
+    print("Error: Number of directories must be equal to the number of apps (match 1-1).")
+    exit()
+  
+  if args.experiments and len(args.experiments) != len(args.apps):
+    print("Error: Number of experiment lists must be equal to the number of apps (match 1-1).")
+    exit(0)
+
+  # Create the output directory, if it does not exit
+  script_dir = os.path.dirname(os.path.realpath(__file__))
+  out_dir = os.path.join(script_dir, args.output_dir)
+  if not os.path.exists(out_dir):
+    os.mkdir(out_dir)
+
+  # Calculcate the amount of subplots
+  if args.xaxis == "experiments":
+    subplots = len(args.apps) # if experiments are on the x-axis, each app has its own subplot
+  elif args.xaxis == "threads":
+    subplots = ",".join(args.experiments).count(',') + 1 # merge the experiments and count the ',' + 1
+
+  # Create the appropriate subplot set
+  _, axes = plt.subplots(1, subplots, figsize=(6 * subplots, 4))
+
+  plot_idx = 0
+  for directory, app, experiments in zip(args.directories, args.apps, args.experiments):
+    print(f"Generating plot for {app} with {args.xaxis} as x-axis -- used experiments: {experiments}")
+    analyzer = ResultsAnalyzer(directory, app, args.annotation, experiments)
+    analyzer.analyze()
+    if subplots > 1:
+      plot_idx = analyzer.plot_results(axes, args.xaxis, args.legend_loc, plot_idx)
+    else:
+      _ = analyzer.plot_results(axes, args.xaxis, args.legend_loc)
+    # verify that all the plots have the same variants so that they can have a unified legend
+    variants = analyzer.fetch_experiment_variants()
+  
+  # using the last version of the variants is sufficient as all the plots should share the same variants
+  cols = 1
+  if args.legend_loc is None: # set the default setup that works for all the plots
+    cols = len(variants)
+  
+  if subplots > 1:
+    axes[0].legend(labels=variants, ncols=cols, loc=args.legend_loc, fontsize="x-small")
+  else:
+    axes.legend(labels=variants, ncols=cols, loc=args.legend_loc, fontsize="x-small")
+  
+  plt.savefig(f"{out_dir}/{args.title}.pdf", dpi=300, format='pdf', bbox_inches='tight')
+  plt.savefig(f"{out_dir}/{args.title}.png", dpi=300, format='png', bbox_inches='tight')
 
 if __name__ == "__main__":
   main()

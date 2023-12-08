@@ -83,8 +83,10 @@ class ResultsPlotter:
       axes.set_xticks(range(0, len(x_axis_labels)), x_axis_labels)
     
     axes.set_ylabel(experiment_data[variant].keys()[0])
-    axes.set_title(self.benchmark_app + " - " + experiment)
-
+    if experiment == "default":
+      axes.set_title(self.benchmark_app)
+    else:
+      axes.set_title(self.benchmark_app + " - " + experiment)
     # return the bars for the annotation
     return bars
 
@@ -170,64 +172,10 @@ class ResultsPlotter:
     axes.set_ylim(0, max(y_limits) + 0.04 * max(y_limits)) # increase the y_lim in case the text goes beyond the border
     return
 
-  def save_fig(self, axes, experiment_data, filename, legend_loc):
-    variants = list(experiment_data.keys()) # number of bars per data point
-    sorted_variants = self.fix_variants_order(variants)
-    cols = 1
-    if legend_loc is None: # set the default setup that works for all the plots
-      legend_loc = "upper center"
-      cols = len(variants)
-    axes.legend(labels=sorted_variants, ncols=cols, loc=legend_loc, fontsize="small")
-    plt.savefig(filename + ".pdf", dpi=300, format='pdf', bbox_inches='tight')
-    plt.savefig(filename + ".png", dpi=300, format='png', bbox_inches='tight')
-    return
+  def plot_bars_threads(self, axes, experiment, experiment_data, save_path=None, annotation=None, legend_loc=None):
+    bars = self.plot_thread_bar(axes, experiment, experiment_data)
+    self.annotate_thread_bar(axes, annotation, experiment_data, bars)
 
-  def plot_bars_threads(self, save_path=None, annotation=None, legend_loc=None):
-    for experiment, experiment_data in self.data.items():
-      fig, axes = plt.subplots(figsize=(10, 6))
-      bars = self.plot_thread_bar(axes, experiment, experiment_data)
-      self.annotate_thread_bar(axes, annotation, experiment_data, bars)
-
-      filename = save_path + "/" + self.benchmark_app + "_" + experiment
-      self.save_fig(axes, experiment_data, filename, legend_loc)
-
-  def plot_bars_threads_grouped(self, save_path=None, annotation=None, legend_loc=None):
-    # Check if a group bar can be provided
-    num_experiments = len(self.data.items())
-    if (num_experiments == 1):
-      print("Group plot omitted --- single experiment")
-      return
-
-    # Create a figure with 1 subplot for each experiment
-    fig, axes = plt.subplots(1, num_experiments, figsize=(6 * num_experiments, 4))
-
-    for i, (experiment, experiment_data) in enumerate(self.data.items()):
-      bars = self.plot_thread_bar(axes[i], experiment, experiment_data)
-      self.annotate_thread_bar(axes[i], annotation, experiment_data, bars)
-
-    filename = save_path + "/" + self.benchmark_app + "_grouped"
-    self.save_fig(axes[0], experiment_data, filename, legend_loc)
-
-  def plot_bars_experiments(self, save_path=None, annotation=None, legend_loc=None):
-    # Create a figure for all the experiments
-    fig, axes = plt.subplots(figsize=(10, 6))
-
+  def plot_bars_experiments(self, axes, save_path=None, annotation=None, legend_loc=None):
     bars = self.plot_experiment_bar(axes, self.data)
     self.annotate_experiment_bar(axes, annotation, self.data, bars)
-    
-    filename = save_path + "/" + self.benchmark_app + "_experiments"
-    self.save_fig(axes, self.data[list(self.data.keys())[0]], filename, legend_loc)
-
-    return
-
-  def plot_bars_experiments_grouped(self, save_path=None, annotation=None, legend_loc=None):
-    # Create a figure for all the experiments
-    fig, axes = plt.subplots(figsize=(10, 6))
-
-    bars = self.plot_experiment_bar(axes, self.data)
-    self.annotate_experiment_bar(axes, annotation, self.data, bars)
-    
-    filename = save_path + "/" + self.benchmark_app + "_experiments_grouped"
-    self.save_fig(axes, self.data[list(self.data.keys())[0]], filename, legend_loc)
-
-    return
