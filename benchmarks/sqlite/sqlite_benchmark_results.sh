@@ -5,7 +5,7 @@ set -e
 THIS_DIR=$(dirname "$(readlink -f "$0")")
 MOUNTPOINT=$THIS_DIR/tmp_mnt
 VM_RESULT_DIR=$MOUNTPOINT/root/gramine/CI-Examples/sqlite/results
-RESULTS_DIR=$THIS_DIR/results_tdx_new_1
+RESULTS_DIR=$THIS_DIR/results
 
 # Gather the results from the guest image
 mkdir -p $MOUNTPOINT
