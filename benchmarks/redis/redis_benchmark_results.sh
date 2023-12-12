@@ -3,7 +3,7 @@
 set -e
 
 THIS_DIR=$(dirname "$(readlink -f "$0")")
-RESULTS_DIR=$THIS_DIR/results_plot_2
+RESULTS_DIR=$THIS_DIR/results
 
 # Organize the results
 declare -A data

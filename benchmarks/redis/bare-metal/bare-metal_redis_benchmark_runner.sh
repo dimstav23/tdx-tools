@@ -74,13 +74,13 @@ function cleanup() {
 # Run the native case
 for THREAD_CNT in "${THREADS[@]}"; do
   run_redis ""
-  run_memtier $REDIS_PORT native $THREAD_CNT
+  # run_memtier $REDIS_PORT native $THREAD_CNT
   run_redis_benchmark $REDIS_PORT native $THREAD_CNT
   cleanup
 
   run_redis ""
   run_socat TCP
-  run_memtier $FWD_PORT socat-native $THREAD_CNT
+  # run_memtier $FWD_PORT socat-native $THREAD_CNT
   run_redis_benchmark $FWD_PORT socat-native $THREAD_CNT
   cleanup
 done
@@ -97,13 +97,13 @@ export PKG_CONFIG_PATH=$GRAMINE_SGX_INSTALL_DIR/lib/x86_64-linux-gnu/pkgconfig:$
 make clean && make SGX=1
 for THREAD_CNT in "${THREADS[@]}"; do
   run_redis "gramine-sgx"
-  run_memtier $REDIS_PORT bm-gramine-sgx $THREAD_CNT
+  # run_memtier $REDIS_PORT bm-gramine-sgx $THREAD_CNT
   run_redis_benchmark $REDIS_PORT bm-gramine-sgx $THREAD_CNT
   cleanup
 
   run_redis "gramine-sgx"
   run_socat TCP
-  run_memtier $FWD_PORT bm-socat-gramine-sgx $THREAD_CNT
+  # run_memtier $FWD_PORT bm-socat-gramine-sgx $THREAD_CNT
   run_redis_benchmark $FWD_PORT bm-socat-gramine-sgx $THREAD_CNT
   cleanup
 done
@@ -119,7 +119,7 @@ for THREAD_CNT in "${THREADS[@]}"; do
   sleep 10
   run_socat VSOCK
   sleep 5
-  run_memtier $FWD_PORT gramine-vm $THREAD_CNT
+  # run_memtier $FWD_PORT gramine-vm $THREAD_CNT
   run_redis_benchmark $FWD_PORT gramine-vm $THREAD_CNT
   cleanup
   sleep 30
@@ -130,7 +130,7 @@ for THREAD_CNT in "${THREADS[@]}"; do
   sleep 10
   run_socat VSOCK
   sleep 5
-  run_memtier $FWD_PORT gramine-tdx $THREAD_CNT
+  # run_memtier $FWD_PORT gramine-tdx $THREAD_CNT
   run_redis_benchmark $FWD_PORT gramine-tdx $THREAD_CNT
   cleanup
   sleep 30
