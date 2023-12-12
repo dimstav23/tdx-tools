@@ -44,9 +44,9 @@ function run_lighttpd() {
 function run_socat() {
   echo "Running socat..."
   if [ "$1" = "TCP" ]; then
-    $BIND0 socat TCP4-LISTEN:$FWD_PORT,reuseaddr,fork,backlog=256 TCP4-CONNECT:localhost:$LIGHTTPD_PORT &
+    $BIND0 socat TCP4-LISTEN:$FWD_PORT,reuseaddr,fork,backlog=256,nodelay TCP4-CONNECT:localhost:$LIGHTTPD_PORT &
   elif [ "$1" = "VSOCK" ]; then
-    $BIND0 socat TCP4-LISTEN:$FWD_PORT,reuseaddr,fork,backlog=256 VSOCK-CONNECT:10:$LIGHTTPD_PORT &
+    $BIND0 socat TCP4-LISTEN:$FWD_PORT,reuseaddr,fork,backlog=256,nodelay VSOCK-CONNECT:10:$LIGHTTPD_PORT &
     sleep 5
   fi
   while ! lsof -i :$FWD_PORT &> /dev/null; do

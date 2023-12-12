@@ -63,7 +63,7 @@ if { $vm_type == "gramine-direct" || $vm_type == "gramine-sgx" } {
 
 # Run socat
 sleep 5
-spawn numactl --cpunodebind=0 --membind=0 socat TCP4-LISTEN:$fwd_port,reuseaddr,fork,backlog=256 TCP-CONNECT:localhost:$lighttpd_port
+spawn numactl --cpunodebind=0 --membind=0 socat TCP4-LISTEN:$fwd_port,reuseaddr,fork,backlog=256,nodelay TCP-CONNECT:localhost:$lighttpd_port
 set socat_id $spawn_id
 
 # Run the client benchmark

@@ -1,5 +1,5 @@
 diff --git a/CI-Examples/common_tools/benchmark-http.sh b/CI-Examples/common_tools/benchmark-http.sh
-index 38b9c5f7..4034b443 100755
+index 38b9c5f7..d5249c49 100755
 --- a/CI-Examples/common_tools/benchmark-http.sh
 +++ b/CI-Examples/common_tools/benchmark-http.sh
 @@ -8,16 +8,15 @@
@@ -80,14 +80,16 @@ index 38b9c5f7..4034b443 100755
 -    LATENCY=$(echo "${LATENCIES[$CONCURRENCY]}" | tr " " "\n" | sort -n | awk '{a[NR]=$0}END{if(NR%2==1)print a[(NR + 1)/2];else print (a[NR/2]+a[NR/2 + 1])/2}')
 -    printf "Concurrency = %3d: Per Thread Median Througput (bytes) = %9.3f, Latency (ms) = %9.3f\n" \
 -        "$CONCURRENCY" "$THROUGHPUT" "$LATENCY" | tee -a "$RESULT"
+-done
+-
+-echo "Result file: $RESULT"
 +    THROUGHPUT=$(echo "${THROUGHPUTS[$CLIENTS]}" | tr " " "\n" | sort -n | awk '{a[NR]=$0}END{if(NR%2==1)print a[(NR + 1)/2];else print (a[NR/2]+a[NR/2 + 1])/2}')
 +    TOTAL_THROUGHPUT=$(echo "${TOTAL_THROUGHPUTS[$CLIENTS]}" | tr " " "\n" | sort -n | awk '{a[NR]=$0}END{if(NR%2==1)print a[(NR + 1)/2];else print (a[NR/2]+a[NR/2 + 1])/2}')
 +    LATENCY=$(echo "${LATENCIES[$CLIENTS]}" | tr " " "\n" | sort -n | awk '{a[NR]=$0}END{if(NR%2==1)print a[(NR + 1)/2];else print (a[NR/2]+a[NR/2 + 1])/2}')
 +    printf "Clients = $CLIENTS Concurrency = %3d: Per Thread Median Throughput (reqs/sec) = %9.3f, Latency (ms) = %9.3f, Total Throughput (reqs/sec) = %9.3f\n" \
 +        "$CONCURRENCY" "$THROUGHPUT" "$LATENCY" "$TOTAL_THROUGHPUT"
- done
--
--echo "Result file: $RESULT"
++done
+\ No newline at end of file
 diff --git a/CI-Examples/lighttpd/Makefile b/CI-Examples/lighttpd/Makefile
 index f27d5c9d..6a175c1f 100644
 --- a/CI-Examples/lighttpd/Makefile
