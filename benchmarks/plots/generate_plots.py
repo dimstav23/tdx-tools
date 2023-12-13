@@ -15,6 +15,8 @@ def main():
                       help='List of comma spearated experiments for each app (case sensitive). 1-1 matching with directories and apps is required.')
   parser.add_argument('--xaxis', '-x', default='threads', choices=['threads', 'experiments'],
                       help='Choose x-axis type. Note that "experiments" type is only available for single-threaded results.')
+  parser.add_argument('--plt_type', '-p', default='bar', choices=['bar', 'line'],
+                      help='Choose plot type. By default the bar plot type is chosen.')
   parser.add_argument('--legend_loc', '-l', default="upper center",
                       help='Choose the location of the legend. Note that in case of a group plot, it applies to the first subplot.')
   parser.add_argument('--output_dir', '-o', default='plots', \
@@ -46,7 +48,7 @@ def main():
     subplots = ",".join(args.experiments).count(',') + 1 # merge the experiments and count the ',' + 1
 
   # Create the appropriate subplot set
-  _, axes = plt.subplots(1, subplots, figsize=(6 * subplots, 4))
+  _, axes = plt.subplots(1, subplots, figsize=(8 * subplots, 3))
 
   plot_idx = 0
   for directory, app, experiments in zip(args.directories, args.apps, args.experiments):
@@ -54,9 +56,9 @@ def main():
     analyzer = ResultsAnalyzer(directory, app, args.annotation, experiments)
     analyzer.analyze()
     if subplots > 1:
-      plot_idx = analyzer.plot_results(axes, args.xaxis, args.legend_loc, plot_idx)
+      plot_idx = analyzer.plot_results(axes, args.plt_type, args.xaxis, args.legend_loc, plot_idx)
     else:
-      _ = analyzer.plot_results(axes, args.xaxis, args.legend_loc)
+      _ = analyzer.plot_results(axes, args.plt_type, args.xaxis, args.legend_loc)
     # verify that all the plots have the same variants so that they can have a unified legend
     variants = analyzer.fetch_experiment_variants()
   

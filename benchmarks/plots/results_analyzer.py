@@ -25,7 +25,7 @@ class ResultsAnalyzer:
     data = self.loader.load_data(self.experiments_filter)
     self.plotter = ResultsPlotter(data, self.benchmark_app)
 
-  def plot_results(self, axes, xaxis, legend_loc, plot_idx=None):
+  def plot_results(self, axes, plt_type, xaxis, legend_loc, plot_idx=None):
     if not self.plotter:
       print("Plotter is not instatiated. Please analyze the results first.")
       exit()
@@ -33,18 +33,30 @@ class ResultsAnalyzer:
       print("Axes for the figure are not provided")
       exit()
 
-    if xaxis == "threads":
-      for experiment, experiment_data in self.plotter.data.items():
+    if plt_type == "bar":
+      if xaxis == "threads":
+        for experiment, experiment_data in self.plotter.data.items():
+          if plot_idx is None:
+            self.plotter.plot_bars_threads(axes, experiment, experiment_data, self.directory, self.annotation, legend_loc)
+          else:
+            self.plotter.plot_bars_threads(axes[plot_idx], experiment, experiment_data, self.directory, self.annotation, legend_loc)
+            plot_idx += 1
+      elif xaxis == "experiments":
         if plot_idx is None:
-          self.plotter.plot_bars_threads(axes, experiment, experiment_data, self.directory, self.annotation, legend_loc)
+          self.plotter.plot_bars_experiments(axes, self.directory, self.annotation, legend_loc)
         else:
-          self.plotter.plot_bars_threads(axes[plot_idx], experiment, experiment_data, self.directory, self.annotation, legend_loc)
+          self.plotter.plot_bars_experiments(axes[plot_idx], self.directory, self.annotation, legend_loc)
           plot_idx += 1
-    elif xaxis == "experiments":
-      if plot_idx is None:
-        self.plotter.plot_bars_experiments(axes, self.directory, self.annotation, legend_loc)
-      else:
-        self.plotter.plot_bars_experiments(axes[plot_idx], self.directory, self.annotation, legend_loc)
-        plot_idx += 1
+    elif plt_type == "line":
+      if xaxis == "threads":
+        for experiment, experiment_data in self.plotter.data.items():
+          if plot_idx is None:
+            self.plotter.plot_lines_threads(axes, experiment, experiment_data, self.directory, self.annotation, legend_loc)
+          else:
+            self.plotter.plot_lines_threads(axes[plot_idx], experiment, experiment_data, self.directory, self.annotation, legend_loc)
+            plot_idx += 1
+      elif xaxis == "experiments":
+        print("Line plot type does not support experiments as x-axis.")
+        exit()
 
     return plot_idx  

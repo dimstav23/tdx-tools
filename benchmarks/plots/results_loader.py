@@ -3,6 +3,7 @@ import pandas as pd
 
 variants_label_map = {
   "native"                :   "Native",
+  "socat-native"          :   "Native w/ socat",
   "efi"                   :   "Normal VM",
   "td"                    :   "Intel TDX VM",
   "bm-gramine-sgx"        :   "Gramine-SGX",

@@ -14,6 +14,7 @@ markers = ['o', 's', '+', 'x', 'D', '*', 'o', 's', '+', 'x', 'D', '*']
 
 variants_plot_sequence = [
   "Native",
+  "Native w/ socat",
   "Normal VM",
   "Normal VM w/ socat",
   "Intel TDX VM",
@@ -124,10 +125,10 @@ class ResultsPlotter:
     sorted_variants = self.fix_variants_order(variants)
 
     bar_area_percentage = 0.8 # bar width to cover 80% of the dedicated space
-    width = float(bar_area_percentage / len(variants)) # width of each bar
+    width = float(bar_area_percentage / len(sorted_variants)) # width of each bar
     x = np.arange(len(x_axis_labels)) # number of xaxis ticks
-    x_spacing = np.linspace(-bar_area_percentage/2 + width/2, bar_area_percentage/2 - width/2, num=len(variants)) # position of each x-tick
-    
+    x_spacing = np.linspace(-bar_area_percentage/2 + width/2, bar_area_percentage/2 - width/2, num=len(sorted_variants)) # position of each x-tick
+
     # plot the bars
     bars = []
     for i, variant in enumerate(sorted_variants):
@@ -179,3 +180,37 @@ class ResultsPlotter:
   def plot_bars_experiments(self, axes, save_path=None, annotation=None, legend_loc=None):
     bars = self.plot_experiment_bar(axes, self.data)
     self.annotate_experiment_bar(axes, annotation, self.data, bars)
+
+  def plot_thread_line(self, axes, experiment, experiment_data):
+    variants = list(experiment_data.keys()) # bars per data point
+    x_axis_labels = list(experiment_data[variants[0]].index) # x-axis data points
+    bar_area_percentage = 0.8 # bar width to cover 80% of the dedicated space
+    width = float(bar_area_percentage / len(variants)) # width of each bar
+    x = np.arange(len(x_axis_labels)) # number of xaxis ticks
+
+    # sort the variants for the bar plots
+    sorted_variants = self.fix_variants_order(variants)
+
+    # plot the bars
+    lines = []
+    for i, variant in enumerate(sorted_variants):
+      line_data = experiment_data[variant].to_numpy().flatten() # values to be plotted
+      lines.append(axes.plot(x, line_data, label=variant,
+                      color = colour[i], marker=markers[i], markersize=4))
+    # if we have a single thread value, do not print xlabel
+    if len(x_axis_labels) == 1:
+      axes.set_xticks([])
+    else:
+      axes.set_xlabel(experiment_data[variants[0]].columns.name)
+      axes.set_xticks(range(0, len(x_axis_labels)), x_axis_labels)
+
+    axes.set_ylabel(experiment_data[variant].keys()[0])
+    if experiment == "default":
+      axes.set_title(self.benchmark_app)
+    else:
+      axes.set_title(self.benchmark_app + " - " + experiment)
+    # return the bars for the annotation
+    return lines
+
+  def plot_lines_threads(self, axes, experiment, experiment_data, save_path=None, annotation=None, legend_loc=None):
+    lines = self.plot_thread_line(axes, experiment, experiment_data)
