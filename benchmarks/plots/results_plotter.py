@@ -25,9 +25,10 @@ variants_plot_sequence = [
 ]
 
 class ResultsPlotter:
-  def __init__(self, data_avg, data_std, benchmark_app):
+  def __init__(self, data_avg, data_std, error_bar, benchmark_app):
     self.data_avg = data_avg
     self.data_std = data_std
+    self.error_bar = error_bar
     self.benchmark_app = benchmark_app
 
   def fix_variants_order(self, variants):
@@ -75,11 +76,13 @@ class ResultsPlotter:
     bars = []
     for i, variant in enumerate(sorted_variants):
       bar_data = experiment_data[variant].to_numpy().flatten() # values to be plotted
-      # error_data = std_error_data[variant].to_numpy().flatten() # standard error bar values
-      # bars.append(axes.bar(x + x_spacing[i], bar_data, yerr=error_data, width=width, label=variant,
-                      # color=colour[i], hatch=hatch[i], edgecolor='black'))
-      bars.append(axes.bar(x + x_spacing[i], bar_data, width=width, label=variant, 
-                      color=colour[i], hatch=hatch[i], edgecolor='black'))
+      error_data = std_error_data[variant].to_numpy().flatten() # standard error bar values
+      if self.error_bar is True:
+        bars.append(axes.bar(x + x_spacing[i], bar_data, yerr=error_data, width=width, label=variant,
+                        color=colour[i], hatch=hatch[i], edgecolor='black'))
+      else:
+        bars.append(axes.bar(x + x_spacing[i], bar_data, width=width, label=variant,
+                        color=colour[i], hatch=hatch[i], edgecolor='black'))
     # if we have a single thread value, do not print xlabel
     if len(x_axis_labels) == 1:
       axes.set_xticks([])
@@ -137,15 +140,17 @@ class ResultsPlotter:
     bars = []
     for i, variant in enumerate(sorted_variants):
       bar_data = []
-      # error_data = []
+      error_data = []
       for _, experiment_data in data_avg.items():
         bar_data.append(experiment_data[variant].iloc[0][experiment_data[variant].columns[0]])
-      # for _, std_error_data in data_std.items():
-      #   error_data.append(std_error_data[variant].iloc[0][std_error_data[variant].columns[0]])
-      # bars.append(axes.bar(x + x_spacing[i], bar_data, yerr=error_data, width=width, label=variant,
-      #                 color = colour[i], hatch=hatch[i], edgecolor='black'))
-      bars.append(axes.bar(x + x_spacing[i], bar_data, width=width, label=variant, 
-                      color = colour[i], hatch=hatch[i], edgecolor='black'))
+      for _, std_error_data in data_std.items():
+        error_data.append(std_error_data[variant].iloc[0][std_error_data[variant].columns[0]])
+      if self.error_bar is True:
+        bars.append(axes.bar(x + x_spacing[i], bar_data, yerr=error_data, width=width, label=variant,
+                        color = colour[i], hatch=hatch[i], edgecolor='black'))
+      else:
+        bars.append(axes.bar(x + x_spacing[i], bar_data, width=width, label=variant,
+                        color = colour[i], hatch=hatch[i], edgecolor='black'))
 
     axes.set_xlabel('Workload')
     axes.set_xticks(range(0, len(x_axis_labels)), x_axis_labels)
@@ -181,11 +186,11 @@ class ResultsPlotter:
     axes.set_ylim(0, max(y_limits) + 0.04 * max(y_limits)) # increase the y_lim in case the text goes beyond the border
     return
 
-  def plot_bars_threads(self, axes, experiment, experiment_data, std_error_data, annotation=None, legend_loc=None):
+  def plot_bars_threads(self, axes, experiment, experiment_data, std_error_data, annotation=None):
     bars = self.plot_thread_bar(axes, experiment, experiment_data, std_error_data)
     self.annotate_thread_bar(axes, annotation, experiment_data, bars)
 
-  def plot_bars_experiments(self, axes, annotation=None, legend_loc=None):
+  def plot_bars_experiments(self, axes, annotation=None):
     bars = self.plot_experiment_bar(axes, self.data_avg, self.data_std)
     self.annotate_experiment_bar(axes, annotation, self.data_avg, bars)
 
@@ -221,5 +226,5 @@ class ResultsPlotter:
     # return the lines
     return lines
 
-  def plot_lines_threads(self, axes, experiment, experiment_data, std_error_data, annotation=None, legend_loc=None):
+  def plot_lines_threads(self, axes, experiment, experiment_data, std_error_data, annotation=None):
     lines = self.plot_thread_line(axes, experiment, experiment_data, std_error_data)

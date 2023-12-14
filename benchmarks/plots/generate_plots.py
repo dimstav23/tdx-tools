@@ -24,8 +24,8 @@ def main():
                       help='Directory to place the plot(s).')
   parser.add_argument('--title', '-t', default='my_plot', \
                       help='Plot title.')
+  parser.add_argument('--error_bar', action='store_true', help="Add standard error bars in the plots.")
   args = parser.parse_args()
-
 
   # Sanity checks
   if len(args.directories) != len(args.apps):
@@ -55,11 +55,11 @@ def main():
   for directories, app, experiments in zip(args.directories, args.apps, args.experiments):
     print(f"Generating plot for {app} with {args.xaxis} as x-axis -- used experiments: {experiments}")
     analyzer = ResultsAnalyzer(directories, app, args.annotation, experiments)
-    analyzer.analyze()
+    analyzer.analyze(args.error_bar)
     if subplots > 1:
-      plot_idx = analyzer.plot_results(axes, args.plt_type, args.xaxis, args.legend_loc, plot_idx)
+      plot_idx = analyzer.plot_results(axes, args.plt_type, args.xaxis, plot_idx)
     else:
-      _ = analyzer.plot_results(axes, args.plt_type, args.xaxis, args.legend_loc)
+      _ = analyzer.plot_results(axes, args.plt_type, args.xaxis)
     # verify that all the plots have the same variants so that they can have a unified legend
     variants = analyzer.fetch_experiment_variants()
   
