@@ -39,18 +39,18 @@ for THREAD_CNT in "${THREADS[@]}"; do
   --intra_op_parallelism_threads=$THREAD_CNT \
   | tail -n 4 | tee ./results/Bert_native_"$THREAD_CNT"_threads.txt
   
-  OMP_NUM_THREADS=$THREAD_CNT KMP_AFFINITY=granularity=fine,verbose,compact,1,0 \
-  numactl --cpunodebind=0 --membind=0 \
-  taskset -a -c 0-$((THREAD_CNT-1)) \
-  python3 \
-  models/models/image_recognition/tensorflow/resnet50v1_5/inference/cpu/eval_image_classifier_inference.py \
-  --input-graph=data/resnet50v1_5_int8_pretrained_model.pb \
-  --num-inter-threads=1 \
-  --num-intra-threads=$THREAD_CNT \
-  --batch-size=512 \
-  --warmup-steps=50 \
-  --steps=500 \
-  | tail -n 4 | tee ./results/RN50_native_"$THREAD_CNT"_threads.txt
+  # OMP_NUM_THREADS=$THREAD_CNT KMP_AFFINITY=granularity=fine,verbose,compact,1,0 \
+  # numactl --cpunodebind=0 --membind=0 \
+  # taskset -a -c 0-$((THREAD_CNT-1)) \
+  # python3 \
+  # models/models/image_recognition/tensorflow/resnet50v1_5/inference/cpu/eval_image_classifier_inference.py \
+  # --input-graph=data/resnet50v1_5_int8_pretrained_model.pb \
+  # --num-inter-threads=1 \
+  # --num-intra-threads=$THREAD_CNT \
+  # --batch-size=512 \
+  # --warmup-steps=50 \
+  # --steps=500 \
+  # | tail -n 4 | tee ./results/RN50_native_"$THREAD_CNT"_threads.txt
 done
 
 # Preserve the current values of the env variables
@@ -84,18 +84,18 @@ for THREAD_CNT in "${THREADS[@]}"; do
   --intra_op_parallelism_threads=$THREAD_CNT \
   | tail -n 4 | tee ./results/Bert_bm-gramine-sgx_"$THREAD_CNT"_threads.txt
   
-  OMP_NUM_THREADS=$THREAD_CNT KMP_AFFINITY=granularity=fine,verbose,compact,1,0 \
-  numactl --cpunodebind=0 --membind=0 \
-  taskset -a -c 0-$((THREAD_CNT-1)) \
-  gramine-sgx python \
-  models/models/image_recognition/tensorflow/resnet50v1_5/inference/cpu/eval_image_classifier_inference.py \
-  --input-graph=data/resnet50v1_5_int8_pretrained_model.pb \
-  --num-inter-threads=1 \
-  --num-intra-threads=$THREAD_CNT \
-  --batch-size=512 \
-  --warmup-steps=50 \
-  --steps=500 \
-  | tail -n 4 | tee ./results/RN50_bm-gramine-sgx_"$THREAD_CNT"_threads.txt
+  # OMP_NUM_THREADS=$THREAD_CNT KMP_AFFINITY=granularity=fine,verbose,compact,1,0 \
+  # numactl --cpunodebind=0 --membind=0 \
+  # taskset -a -c 0-$((THREAD_CNT-1)) \
+  # gramine-sgx python \
+  # models/models/image_recognition/tensorflow/resnet50v1_5/inference/cpu/eval_image_classifier_inference.py \
+  # --input-graph=data/resnet50v1_5_int8_pretrained_model.pb \
+  # --num-inter-threads=1 \
+  # --num-intra-threads=$THREAD_CNT \
+  # --batch-size=512 \
+  # --warmup-steps=50 \
+  # --steps=500 \
+  # | tail -n 4 | tee ./results/RN50_bm-gramine-sgx_"$THREAD_CNT"_threads.txt
 done
 
 # Run the gramine-vm and gramine-tdx case
@@ -127,18 +127,18 @@ for THREAD_CNT in "${THREADS[@]}"; do
   --intra_op_parallelism_threads=$THREAD_CNT \
   | tail -n 4 | tee ./results/Bert_gramine-vm_"$THREAD_CNT"_threads.txt
 
-  OMP_NUM_THREADS=$THREAD_CNT KMP_AFFINITY=granularity=fine,verbose,compact,1,0 \
-  numactl --cpunodebind=0 --membind=0 \
-  taskset -a -c 0-$((THREAD_CNT-1)) \
-  gramine-vm python \
-  models/models/image_recognition/tensorflow/resnet50v1_5/inference/cpu/eval_image_classifier_inference.py \
-  --input-graph=data/resnet50v1_5_int8_pretrained_model.pb \
-  --num-inter-threads=1 \
-  --num-intra-threads=$THREAD_CNT \
-  --batch-size=512 \
-  --warmup-steps=50 \
-  --steps=500 \
-  | tail -n 4 | tee ./results/RN50_gramine-vm_"$THREAD_CNT"_threads.txt
+  # OMP_NUM_THREADS=$THREAD_CNT KMP_AFFINITY=granularity=fine,verbose,compact,1,0 \
+  # numactl --cpunodebind=0 --membind=0 \
+  # taskset -a -c 0-$((THREAD_CNT-1)) \
+  # gramine-vm python \
+  # models/models/image_recognition/tensorflow/resnet50v1_5/inference/cpu/eval_image_classifier_inference.py \
+  # --input-graph=data/resnet50v1_5_int8_pretrained_model.pb \
+  # --num-inter-threads=1 \
+  # --num-intra-threads=$THREAD_CNT \
+  # --batch-size=512 \
+  # --warmup-steps=50 \
+  # --steps=500 \
+  # | tail -n 4 | tee ./results/RN50_gramine-vm_"$THREAD_CNT"_threads.txt
 done
 for THREAD_CNT in "${THREADS[@]}"; do
   export QEMU_CPU_NUM=$THREAD_CNT
@@ -163,18 +163,18 @@ for THREAD_CNT in "${THREADS[@]}"; do
   --intra_op_parallelism_threads=$THREAD_CNT \
   | tail -n 4 | tee ./results/Bert_gramine-tdx_"$THREAD_CNT"_threads.txt
   
-  OMP_NUM_THREADS=$THREAD_CNT KMP_AFFINITY=granularity=fine,verbose,compact,1,0 \
-  numactl --cpunodebind=0 --membind=0 \
-  taskset -a -c 0-$((THREAD_CNT-1)) \
-  gramine-tdx python \
-  models/models/image_recognition/tensorflow/resnet50v1_5/inference/cpu/eval_image_classifier_inference.py \
-  --input-graph=data/resnet50v1_5_int8_pretrained_model.pb \
-  --num-inter-threads=1 \
-  --num-intra-threads=$THREAD_CNT \
-  --batch-size=512 \
-  --warmup-steps=50 \
-  --steps=500 \
-  | tail -n 4 | tee ./results/RN50_gramine-tdx_"$THREAD_CNT"_threads.txt
+  # OMP_NUM_THREADS=$THREAD_CNT KMP_AFFINITY=granularity=fine,verbose,compact,1,0 \
+  # numactl --cpunodebind=0 --membind=0 \
+  # taskset -a -c 0-$((THREAD_CNT-1)) \
+  # gramine-tdx python \
+  # models/models/image_recognition/tensorflow/resnet50v1_5/inference/cpu/eval_image_classifier_inference.py \
+  # --input-graph=data/resnet50v1_5_int8_pretrained_model.pb \
+  # --num-inter-threads=1 \
+  # --num-intra-threads=$THREAD_CNT \
+  # --batch-size=512 \
+  # --warmup-steps=50 \
+  # --steps=500 \
+  # | tail -n 4 | tee ./results/RN50_gramine-tdx_"$THREAD_CNT"_threads.txt
 done
 
 mkdir -p $RESULTS_DIR

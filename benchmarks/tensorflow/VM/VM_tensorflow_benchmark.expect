@@ -59,17 +59,17 @@ if { $vm_type == "gramine-direct" || $vm_type == "gramine-sgx" } {
   --inter_op_parallelism_threads=1 \
   --intra_op_parallelism_threads=${cores} \
   | tail -n 4 | tee ./results/Bert_vm-${vm_type}_${cores}_threads.txt\r"
-  expect "# "
-  send -- "OMP_NUM_THREADS=${cores} KMP_AFFINITY=granularity=fine,verbose,compact,1,0 \
-  numactl --cpunodebind=0 --membind=0 ${vm_type} python \
-  models/models/image_recognition/tensorflow/resnet50v1_5/inference/cpu/eval_image_classifier_inference.py \
-  --input-graph=data/resnet50v1_5_int8_pretrained_model.pb \
-  --num-inter-threads=1 \
-  --num-intra-threads=${cores} \
-  --batch-size=512 \
-  --warmup-steps=50 \
-  --steps=500 \
-  | tail -n 4 | tee ./results/RN50_vm-${vm_type}_${cores}_threads.txt\r"
+  # expect "# "
+  # send -- "OMP_NUM_THREADS=${cores} KMP_AFFINITY=granularity=fine,verbose,compact,1,0 \
+  # numactl --cpunodebind=0 --membind=0 ${vm_type} python \
+  # models/models/image_recognition/tensorflow/resnet50v1_5/inference/cpu/eval_image_classifier_inference.py \
+  # --input-graph=data/resnet50v1_5_int8_pretrained_model.pb \
+  # --num-inter-threads=1 \
+  # --num-intra-threads=${cores} \
+  # --batch-size=512 \
+  # --warmup-steps=50 \
+  # --steps=500 \
+  # | tail -n 4 | tee ./results/RN50_vm-${vm_type}_${cores}_threads.txt\r"
 } else {
   send -- "make clean\r"
   expect -- "# "
@@ -90,17 +90,17 @@ if { $vm_type == "gramine-direct" || $vm_type == "gramine-sgx" } {
   --inter_op_parallelism_threads=1 \
   --intra_op_parallelism_threads=${cores} \
   | tail -n 4 | tee ./results/Bert_${vm_type}_${cores}_threads.txt\r"
-  expect "# "
-  send -- "OMP_NUM_THREADS=${cores} KMP_AFFINITY=granularity=fine,verbose,compact,1,0 \
-  numactl --cpunodebind=0 --membind=0 python3 \
-  models/models/image_recognition/tensorflow/resnet50v1_5/inference/cpu/eval_image_classifier_inference.py \
-  --input-graph=data/resnet50v1_5_int8_pretrained_model.pb \
-  --num-inter-threads=1 \
-  --num-intra-threads=${cores} \
-  --batch-size=512 \
-  --warmup-steps=50 \
-  --steps=500 \
-  | tail -n 4 | tee ./results/RN50_${vm_type}_${cores}_threads.txt\r"
+  # expect "# "
+  # send -- "OMP_NUM_THREADS=${cores} KMP_AFFINITY=granularity=fine,verbose,compact,1,0 \
+  # numactl --cpunodebind=0 --membind=0 python3 \
+  # models/models/image_recognition/tensorflow/resnet50v1_5/inference/cpu/eval_image_classifier_inference.py \
+  # --input-graph=data/resnet50v1_5_int8_pretrained_model.pb \
+  # --num-inter-threads=1 \
+  # --num-intra-threads=${cores} \
+  # --batch-size=512 \
+  # --warmup-steps=50 \
+  # --steps=500 \
+  # | tail -n 4 | tee ./results/RN50_${vm_type}_${cores}_threads.txt\r"
 }
 
 # expect the experiment to finish and poweroff the Guest VM
