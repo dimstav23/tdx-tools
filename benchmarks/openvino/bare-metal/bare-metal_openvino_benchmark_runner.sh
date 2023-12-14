@@ -29,12 +29,12 @@ for THREAD_CNT in "${THREADS[@]}"; do
     -nstreams $THREAD_CNT -nthreads $THREAD_CNT -nireq $THREAD_CNT \
   | tail -n 10 | tee ./results/RN50_native_"$THREAD_CNT"_threads.txt
 
-  KMP_AFFINITY=granularity=fine,noverbose,compact,1,0 numactl --cpubind=0 --membind=0 \
-    ./benchmark_app \
-    -m model/intel/bert-large-uncased-whole-word-masking-squad-int8-0001/FP16-INT8/bert-large-uncased-whole-word-masking-squad-int8-0001.xml \
-    -d CPU -b 1 -t $EXPERIMENT_TIME -hint none \
-    -nstreams $THREAD_CNT -nthreads $THREAD_CNT -nireq $THREAD_CNT \
-  | tail -n 10 | tee ./results/Bert_native_"$THREAD_CNT"_threads.txt
+  # KMP_AFFINITY=granularity=fine,noverbose,compact,1,0 numactl --cpubind=0 --membind=0 \
+  #   ./benchmark_app \
+  #   -m model/intel/bert-large-uncased-whole-word-masking-squad-int8-0001/FP16-INT8/bert-large-uncased-whole-word-masking-squad-int8-0001.xml \
+  #   -d CPU -b 1 -t $EXPERIMENT_TIME -hint none \
+  #   -nstreams $THREAD_CNT -nthreads $THREAD_CNT -nireq $THREAD_CNT \
+  # | tail -n 10 | tee ./results/Bert_native_"$THREAD_CNT"_threads.txt
 done
 
 # Preserve the current values of the env variables
@@ -55,12 +55,12 @@ for THREAD_CNT in "${THREADS[@]}"; do
     -nstreams $THREAD_CNT -nthreads $THREAD_CNT -nireq $THREAD_CNT \
   | tail -n 10 | tee ./results/RN50_bm-gramine-sgx_"$THREAD_CNT"_threads.txt
 
-  KMP_AFFINITY=granularity=fine,noverbose,compact,1,0 numactl --cpubind=0 --membind=0 \
-    gramine-sgx benchmark_app \
-    -m model/intel/bert-large-uncased-whole-word-masking-squad-int8-0001/FP16-INT8/bert-large-uncased-whole-word-masking-squad-int8-0001.xml \
-    -d CPU -b 1 -t $EXPERIMENT_TIME -hint none \
-    -nstreams $THREAD_CNT -nthreads $THREAD_CNT -nireq $THREAD_CNT \
-  | tail -n 10 | tee ./results/Bert_bm-gramine-sgx_"$THREAD_CNT"_threads.txt
+  # KMP_AFFINITY=granularity=fine,noverbose,compact,1,0 numactl --cpubind=0 --membind=0 \
+  #   gramine-sgx benchmark_app \
+  #   -m model/intel/bert-large-uncased-whole-word-masking-squad-int8-0001/FP16-INT8/bert-large-uncased-whole-word-masking-squad-int8-0001.xml \
+  #   -d CPU -b 1 -t $EXPERIMENT_TIME -hint none \
+  #   -nstreams $THREAD_CNT -nthreads $THREAD_CNT -nireq $THREAD_CNT \
+  # | tail -n 10 | tee ./results/Bert_bm-gramine-sgx_"$THREAD_CNT"_threads.txt
 done
 
 # Run the gramine-vm and gramine-tdx case
@@ -77,12 +77,12 @@ for THREAD_CNT in "${THREADS[@]}"; do
     -nstreams $THREAD_CNT -nthreads $THREAD_CNT -nireq $THREAD_CNT \
   | tail -n 10 | tee ./results/RN50_gramine-vm_"$THREAD_CNT"_threads.txt
 
-  KMP_AFFINITY=granularity=fine,noverbose,compact,1,0 numactl --cpubind=0 --membind=0 \
-    gramine-vm benchmark_app \
-    -m model/intel/bert-large-uncased-whole-word-masking-squad-int8-0001/FP16-INT8/bert-large-uncased-whole-word-masking-squad-int8-0001.xml \
-    -d CPU -b 1 -t $EXPERIMENT_TIME -hint none \
-    -nstreams $THREAD_CNT -nthreads $THREAD_CNT -nireq $THREAD_CNT \
-  | tail -n 10 | tee ./results/Bert_gramine-vm_"$THREAD_CNT"_threads.txt
+  # KMP_AFFINITY=granularity=fine,noverbose,compact,1,0 numactl --cpubind=0 --membind=0 \
+  #   gramine-vm benchmark_app \
+  #   -m model/intel/bert-large-uncased-whole-word-masking-squad-int8-0001/FP16-INT8/bert-large-uncased-whole-word-masking-squad-int8-0001.xml \
+  #   -d CPU -b 1 -t $EXPERIMENT_TIME -hint none \
+  #   -nstreams $THREAD_CNT -nthreads $THREAD_CNT -nireq $THREAD_CNT \
+  # | tail -n 10 | tee ./results/Bert_gramine-vm_"$THREAD_CNT"_threads.txt
 done
 for THREAD_CNT in "${THREADS[@]}"; do
   export QEMU_CPU_NUM=$THREAD_CNT
@@ -93,12 +93,12 @@ for THREAD_CNT in "${THREADS[@]}"; do
     -nstreams $THREAD_CNT -nthreads $THREAD_CNT -nireq $THREAD_CNT \
   | tail -n 10 | tee ./results/RN50_gramine-tdx_"$THREAD_CNT"_threads.txt
 
-  KMP_AFFINITY=granularity=fine,noverbose,compact,1,0 numactl --cpubind=0 --membind=0 \
-    gramine-tdx benchmark_app \
-    -m model/intel/bert-large-uncased-whole-word-masking-squad-int8-0001/FP16-INT8/bert-large-uncased-whole-word-masking-squad-int8-0001.xml \
-    -d CPU -b 1 -t $EXPERIMENT_TIME -hint none \
-    -nstreams $THREAD_CNT -nthreads $THREAD_CNT -nireq $THREAD_CNT \
-  | tail -n 10 | tee ./results/Bert_gramine-tdx_"$THREAD_CNT"_threads.txt
+  # KMP_AFFINITY=granularity=fine,noverbose,compact,1,0 numactl --cpubind=0 --membind=0 \
+  #   gramine-tdx benchmark_app \
+  #   -m model/intel/bert-large-uncased-whole-word-masking-squad-int8-0001/FP16-INT8/bert-large-uncased-whole-word-masking-squad-int8-0001.xml \
+  #   -d CPU -b 1 -t $EXPERIMENT_TIME -hint none \
+  #   -nstreams $THREAD_CNT -nthreads $THREAD_CNT -nireq $THREAD_CNT \
+  # | tail -n 10 | tee ./results/Bert_gramine-tdx_"$THREAD_CNT"_threads.txt
 done
 
 mkdir -p $RESULTS_DIR
