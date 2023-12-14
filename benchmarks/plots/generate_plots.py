@@ -6,7 +6,8 @@ from results_analyzer import ResultsAnalyzer
 def main():
   parser = argparse.ArgumentParser(description='Produce plots for Gramine-TDX.')
   parser.add_argument('--directories', '-d', nargs='+', required=True, \
-                      help='List of directories containing CSV files.')
+                      help='List of directories containing CSV files. For multiple directories for the results of one app, \
+                      use the \":\" separator and the plot will be based on the average of these results.')
   parser.add_argument('--apps', '-a', nargs='+', required=True, \
                       help='List of the applications. 1-1 matching with the directories is required.')
   parser.add_argument('--annotation', '-n', default=None, choices=['absolute', 'overhead'], \
@@ -51,9 +52,9 @@ def main():
   _, axes = plt.subplots(1, subplots, figsize=(8 * subplots, 3))
 
   plot_idx = 0
-  for directory, app, experiments in zip(args.directories, args.apps, args.experiments):
+  for directories, app, experiments in zip(args.directories, args.apps, args.experiments):
     print(f"Generating plot for {app} with {args.xaxis} as x-axis -- used experiments: {experiments}")
-    analyzer = ResultsAnalyzer(directory, app, args.annotation, experiments)
+    analyzer = ResultsAnalyzer(directories, app, args.annotation, experiments)
     analyzer.analyze()
     if subplots > 1:
       plot_idx = analyzer.plot_results(axes, args.plt_type, args.xaxis, args.legend_loc, plot_idx)
