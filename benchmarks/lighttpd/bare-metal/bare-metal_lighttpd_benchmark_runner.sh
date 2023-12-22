@@ -76,14 +76,14 @@ for THREAD_CNT in "${THREADS[@]}"; do
   run_lighttpd "native"
   run_benchmark $LIGHTTPD_PORT native $THREAD_CNT "100.1.html"
   run_benchmark $LIGHTTPD_PORT native $THREAD_CNT "10K.1.html"
-  run_benchmark $LIGHTTPD_PORT native $THREAD_CNT "1M.1.html"
+  # run_benchmark $LIGHTTPD_PORT native $THREAD_CNT "1M.1.html"
   cleanup
 
   run_lighttpd "native"
   run_socat TCP
   run_benchmark $FWD_PORT socat-native $THREAD_CNT "100.1.html"
   run_benchmark $FWD_PORT socat-native $THREAD_CNT "10K.1.html"
-  run_benchmark $FWD_PORT socat-native $THREAD_CNT "1M.1.html"
+  # run_benchmark $FWD_PORT socat-native $THREAD_CNT "1M.1.html"
   cleanup
 done
 
@@ -101,14 +101,14 @@ for THREAD_CNT in "${THREADS[@]}"; do
   run_lighttpd "gramine-sgx"
   run_benchmark $LIGHTTPD_PORT bm-gramine-sgx $THREAD_CNT "100.1.html"
   run_benchmark $LIGHTTPD_PORT bm-gramine-sgx $THREAD_CNT "10K.1.html"
-  run_benchmark $LIGHTTPD_PORT bm-gramine-sgx $THREAD_CNT "1M.1.html"
+  # run_benchmark $LIGHTTPD_PORT bm-gramine-sgx $THREAD_CNT "1M.1.html"
   cleanup
 
   run_lighttpd "gramine-sgx"
   run_socat TCP
   run_benchmark $FWD_PORT bm-socat-gramine-sgx $THREAD_CNT "100.1.html"
   run_benchmark $FWD_PORT bm-socat-gramine-sgx $THREAD_CNT "10K.1.html"
-  run_benchmark $FWD_PORT bm-socat-gramine-sgx $THREAD_CNT "1M.1.html"
+  # run_benchmark $FWD_PORT bm-socat-gramine-sgx $THREAD_CNT "1M.1.html"
   cleanup
 done
 
@@ -125,7 +125,7 @@ for THREAD_CNT in "${THREADS[@]}"; do
   sleep 5
   run_benchmark $FWD_PORT gramine-vm $THREAD_CNT "100.1.html"
   run_benchmark $FWD_PORT gramine-vm $THREAD_CNT "10K.1.html"
-  run_benchmark $FWD_PORT gramine-vm $THREAD_CNT "1M.1.html"
+  # run_benchmark $FWD_PORT gramine-vm $THREAD_CNT "1M.1.html"
   cleanup
   sleep 30
 done
@@ -137,7 +137,7 @@ for THREAD_CNT in "${THREADS[@]}"; do
   sleep 5
   run_benchmark $FWD_PORT gramine-tdx $THREAD_CNT "100.1.html"
   run_benchmark $FWD_PORT gramine-tdx $THREAD_CNT "10K.1.html"
-  run_benchmark $FWD_PORT gramine-tdx $THREAD_CNT "1M.1.html"
+  # run_benchmark $FWD_PORT gramine-tdx $THREAD_CNT "1M.1.html"
   cleanup
   sleep 30
 done
