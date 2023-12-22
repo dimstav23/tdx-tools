@@ -41,18 +41,18 @@ export PATH=$GRAMINE_SGX_INSTALL_DIR/bin:$CURR_PATH
 export PYTHONPATH=$GRAMINE_SGX_INSTALL_DIR/lib/python3.10/site-packages:$CURR_PYTHONPATH
 export PKG_CONFIG_PATH=$GRAMINE_SGX_INSTALL_DIR/lib/x86_64-linux-gnu/pkgconfig:$CURR_PKG_CONFIG_PATH
 make clean && make SGX=1
-for THREAD_CNT in "${THREADS[@]}"; do
-  ./kvtest init db/test.db --count 500k --size 4k --variance 2k
-  numactl --cpunodebind=0 --membind=0 gramine-direct kvtest run db/test.db --count 500k --stats \
-  | tail -n 4 | tee ./results/read_bm-gramine-direct_"$THREAD_CNT"_threads.txt
-  numactl --cpunodebind=0 --membind=0 gramine-direct kvtest run db/test.db --count 500k --stats --random \
-  | tail -n 4 | tee ./results/read-random_bm-gramine-direct_"$THREAD_CNT"_threads.txt
-  numactl --cpunodebind=0 --membind=0 gramine-direct kvtest run db/test.db --count 500k --stats --update \
-  | tail -n 4 | tee ./results/update_bm-gramine-direct_"$THREAD_CNT"_threads.txt
-  numactl --cpunodebind=0 --membind=0 gramine-direct kvtest run db/test.db --count 500k --stats --update --random \
-  | tail -n 4 | tee ./results/update-random_bm-gramine-direct_"$THREAD_CNT"_threads.txt
-  rm -f db/*
-done
+# for THREAD_CNT in "${THREADS[@]}"; do
+#   ./kvtest init db/test.db --count 500k --size 4k --variance 2k
+#   numactl --cpunodebind=0 --membind=0 gramine-direct kvtest run db/test.db --count 500k --stats \
+#   | tail -n 4 | tee ./results/read_bm-gramine-direct_"$THREAD_CNT"_threads.txt
+#   numactl --cpunodebind=0 --membind=0 gramine-direct kvtest run db/test.db --count 500k --stats --random \
+#   | tail -n 4 | tee ./results/read-random_bm-gramine-direct_"$THREAD_CNT"_threads.txt
+#   numactl --cpunodebind=0 --membind=0 gramine-direct kvtest run db/test.db --count 500k --stats --update \
+#   | tail -n 4 | tee ./results/update_bm-gramine-direct_"$THREAD_CNT"_threads.txt
+#   numactl --cpunodebind=0 --membind=0 gramine-direct kvtest run db/test.db --count 500k --stats --update --random \
+#   | tail -n 4 | tee ./results/update-random_bm-gramine-direct_"$THREAD_CNT"_threads.txt
+#   rm -f db/*
+# done
 for THREAD_CNT in "${THREADS[@]}"; do
   ./kvtest init db/test.db --count 500k --size 4k --variance 2k
   numactl --cpunodebind=0 --membind=0 gramine-sgx kvtest run db/test.db --count 500k --stats \
