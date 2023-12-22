@@ -3,6 +3,19 @@ import matplotlib.pyplot as plt
 import os
 from results_analyzer import ResultsAnalyzer
 
+app_name_map = {
+  "pytorch"               :   "PyTorch",
+  "openvino"              :   "OpenVINO",
+  "memcached"             :   "Memcached",
+  "redis"                 :   "Redis",
+  "blender"               :   "Blender",
+  "lighttpd"              :   "Lighttpd",
+  "sqlite"                :   "SQLite",
+  "sqlite-tmpfs"          :   "SQLite - tmpfs",
+  "tensorflow"            :   "TensorFlow",
+  "python"                :   "Python"
+}
+
 def main():
   parser = argparse.ArgumentParser(description='Produce plots for Gramine-TDX.')
   parser.add_argument('--directories', '-d', nargs='+', required=True, \
@@ -54,7 +67,7 @@ def main():
   plot_idx = 0
   for directories, app, experiments in zip(args.directories, args.apps, args.experiments):
     print(f"Generating plot for {app} with {args.xaxis} as x-axis -- used experiments: {experiments}")
-    analyzer = ResultsAnalyzer(directories, app, args.annotation, experiments)
+    analyzer = ResultsAnalyzer(directories, app_name_map[app.lower()], args.annotation, experiments)
     analyzer.analyze(args.error_bar)
     if subplots > 1:
       plot_idx = analyzer.plot_results(axes, args.plt_type, args.xaxis, plot_idx)

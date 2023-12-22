@@ -87,13 +87,18 @@ class ResultsPlotter:
     if len(x_axis_labels) == 1:
       axes.set_xticks([])
     else:
-      axes.set_xlabel('Threads')
+      axes.set_xlabel(experiment_data[variant].keys().name)
       axes.set_xticks(range(0, len(x_axis_labels)), x_axis_labels)
     
     axes.set_ylabel(experiment_data[variant].keys()[0])
     if experiment == "default":
-      axes.set_title(self.benchmark_app)
+      if self.benchmark_app == "PyTorch": # custom fix for pytorch title
+        axes.set_title(self.benchmark_app + " - AlexNet")
+      else:
+        axes.set_title(self.benchmark_app)
     else:
+      if experiment.lower() == "bert": # custom fix for BERT capitalization in the title
+        experiment = "BERT"
       axes.set_title(self.benchmark_app + " - " + experiment)
     # return the bars for the annotation
     return bars
