@@ -66,7 +66,8 @@ def main():
 
   plot_idx = 0
   for directories, app, experiments in zip(args.directories, args.apps, args.experiments):
-    print(f"Generating plot for {app} with {args.xaxis} as x-axis -- used experiments: {experiments}")
+    print(f"Generating {args.title} plot for {app} with {args.xaxis} as x-axis", end =" ")
+    print(f"-- used experiments: {experiments}, annotation type: {args.annotation}, error bars: {args.error_bar}")
     analyzer = ResultsAnalyzer(directories, app_name_map[app.lower()], args.annotation, experiments)
     analyzer.analyze(args.error_bar)
     if subplots > 1:
