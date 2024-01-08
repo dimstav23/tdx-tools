@@ -21,9 +21,9 @@ class ResultsAnalyzer:
         variants = list(experiment_data.keys())
     return self.plotter.fix_variants_order(variants)
 
-  def analyze(self, error_bar):
+  def analyze(self, error_bar, metric_type):
     (data_avg, data_std) = self.loader.load_data(self.experiments_filter)
-    self.plotter = ResultsPlotter(data_avg, data_std, error_bar, self.benchmark_app)
+    self.plotter = ResultsPlotter(data_avg, data_std, error_bar, metric_type, self.benchmark_app)
 
   def plot_results(self, axes, plt_type, xaxis, plot_idx=None):
     if not self.plotter:

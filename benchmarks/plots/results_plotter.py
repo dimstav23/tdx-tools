@@ -25,10 +25,11 @@ variants_plot_sequence = [
 ]
 
 class ResultsPlotter:
-  def __init__(self, data_avg, data_std, error_bar, benchmark_app):
+  def __init__(self, data_avg, data_std, error_bar, metric_type, benchmark_app):
     self.data_avg = data_avg
     self.data_std = data_std
     self.error_bar = error_bar
+    self.metric_type = metric_type
     self.benchmark_app = benchmark_app
 
   def fix_variants_order(self, variants):
@@ -39,6 +40,27 @@ class ResultsPlotter:
     labeled_variants = [variant for variant in variants_plot_sequence if variant in variants]
 
     return labeled_variants
+
+  def annotate_directional_arrow(self, axes):
+    FONT_SIZE = 9
+    xytext=(20, 150)
+    if self.metric_type == "LIB":
+      text = "Lower is better ↓"
+    elif self.metric_type == "HIB":
+      text = "Higher is better ↑"
+    else:
+      print("No metric type is provided. Possible values: LIB (lower is better) or HIB (higher is better).")
+      exit(0)
+
+    axes.annotate(
+      text,
+      xycoords="axes points",
+      xy=(0, 0),
+      xytext=xytext,
+      fontsize=FONT_SIZE,
+      color="navy",
+      weight="bold",
+    )
 
   def annotate_abs_values(self, axes, bars, data, y_lim):
     fontsize = 6
@@ -193,11 +215,15 @@ class ResultsPlotter:
 
   def plot_bars_threads(self, axes, experiment, experiment_data, std_error_data, annotation=None):
     bars = self.plot_thread_bar(axes, experiment, experiment_data, std_error_data)
-    self.annotate_thread_bar(axes, annotation, experiment_data, bars)
+    if annotation != None:
+      self.annotate_thread_bar(axes, annotation, experiment_data, bars)
+    self.annotate_directional_arrow(axes)
 
   def plot_bars_experiments(self, axes, annotation=None):
     bars = self.plot_experiment_bar(axes, self.data_avg, self.data_std)
-    self.annotate_experiment_bar(axes, annotation, self.data_avg, bars)
+    if annotation != None:
+      self.annotate_experiment_bar(axes, annotation, self.data_avg, bars)
+    self.annotate_directional_arrow(axes)
 
   def plot_thread_line(self, axes, experiment, experiment_data, std_error_data):
     variants = list(experiment_data.keys()) # bars per data point

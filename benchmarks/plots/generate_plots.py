@@ -29,6 +29,9 @@ def main():
                       help='List of comma spearated experiments for each app (case sensitive). 1-1 matching with directories and apps is required.')
   parser.add_argument('--xaxis', '-x', default='threads', choices=['threads', 'experiments'],
                       help='Choose x-axis type. Note that "experiments" type is only available for single-threaded results.')
+  parser.add_argument('--metric_types', '-m', nargs='+', required=True, default=None, choices=['LIB', 'HIB'], 
+                      help='List of metric types. Choose from "LIB" (Lower Is Better) and "HIB" (Higher Is Better). \
+                      1-1 matching with directories and apps is required.')
   parser.add_argument('--plt_type', '-p', default='bar', choices=['bar', 'line'],
                       help='Choose plot type. By default the bar plot type is chosen.')
   parser.add_argument('--legend_loc', '-l', default="upper center",
@@ -65,11 +68,11 @@ def main():
   _, axes = plt.subplots(1, subplots, figsize=(8 * subplots, 3))
 
   plot_idx = 0
-  for directories, app, experiments in zip(args.directories, args.apps, args.experiments):
+  for directories, app, experiments, metric_type in zip(args.directories, args.apps, args.experiments, args.metric_types):
     print(f"Generating {args.title} plot for {app} with {args.xaxis} as x-axis", end =" ")
     print(f"-- used experiments: {experiments}, annotation type: {args.annotation}, error bars: {args.error_bar}")
     analyzer = ResultsAnalyzer(directories, app_name_map[app.lower()], args.annotation, experiments)
-    analyzer.analyze(args.error_bar)
+    analyzer.analyze(args.error_bar, metric_type)
     if subplots > 1:
       plot_idx = analyzer.plot_results(axes, args.plt_type, args.xaxis, plot_idx)
     else:
@@ -83,10 +86,11 @@ def main():
     cols = len(variants)
   
   if subplots > 1:
-    axes[0].legend(labels=variants, ncols=cols, loc=args.legend_loc, fontsize="x-small")
+    axes[0].legend(labels=variants, ncols=cols, loc=args.legend_loc, fontsize="small")
   else:
-    axes.legend(labels=variants, ncols=cols, loc=args.legend_loc, fontsize="x-small")
+    axes.legend(labels=variants, ncols=cols, loc=args.legend_loc, fontsize="small")
   
+  plt.tight_layout()
   plt.savefig(f"{out_dir}/{args.title}.pdf", dpi=300, format='pdf', bbox_inches='tight')
   plt.savefig(f"{out_dir}/{args.title}.png", dpi=300, format='png', bbox_inches='tight')
 
