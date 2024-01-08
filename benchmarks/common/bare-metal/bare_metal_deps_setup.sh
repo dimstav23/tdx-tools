@@ -90,16 +90,16 @@ fi
 
 # Download, build and install gramine-tdx
 cd $DEPS_DIR
-if [ -d "dkuvaisk.gramine-tdx" ]; then
+if [ -d "gramine-tdx" ]; then
   echo "Gramine-TDX directory already exists -- skip cloning"
 else
   echo "Cloning Gramine-TDX"
   git clone ${GRAMINE_TDX_GIT_URL}
-  cd $DEPS_DIR/dkuvaisk.gramine-tdx
+  cd $DEPS_DIR/gramine-tdx
   git checkout ${GRAMINE_TDX_COMMIT}
 fi
 
-cd $DEPS_DIR/dkuvaisk.gramine-tdx
+cd $DEPS_DIR/gramine-tdx
 if [ -d "build-release" ]; then
   echo "Gramine-TDX build-release directory already exists"
   echo "Skipping Gramine-TDX build & install phase"

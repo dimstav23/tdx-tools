@@ -6,7 +6,7 @@ THIS_DIR=$(dirname "$(readlink -f "$0")")
 DEPS_DIR=$THIS_DIR/../../common/bare-metal/deps
 RESULTS_DIR=$THIS_DIR/../results
 GRAMINE_SGX_INSTALL_DIR=$DEPS_DIR/gramine/build-release
-GRAMINE_TDX_INSTALL_DIR=$DEPS_DIR/dkuvaisk.gramine-tdx/build-release
+GRAMINE_TDX_INSTALL_DIR=$DEPS_DIR/gramine-tdx/build-release
 BENCHMARK_DIR=$DEPS_DIR/gramine/CI-Examples/lighttpd
 
 THREADS=(1) # lighttpd is single threaded
