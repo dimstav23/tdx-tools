@@ -17,6 +17,13 @@ for file in $RESULTS_DIR/*.txt; do
   thread=$(echo "$file_name" | cut -d'_' -f3)
   if [[ $benchmark == "memtier-benchmark" ]]; then
     # sed to get the first occurence of {number}.{number} (floating point)
+    benchmark="memtier-Set"
+    throughput=$(cat "$file" | tail -n 4 | head -1 | sed -E 's,^[^0-9]*([0-9]+.[0-9]+).*$,\1,')
+    data["$benchmark,$vm_type,$thread"]=$throughput
+    benchmark="memtier-Get"
+    throughput=$(cat "$file" | tail -n 3 | head -1 | sed -E 's,^[^0-9]*([0-9]+.[0-9]+).*$,\1,')
+    data["$benchmark,$vm_type,$thread"]=$throughput
+    benchmark="memtier-Total"
     throughput=$(cat "$file" | tail -n 1 | sed -E 's,^[^0-9]*([0-9]+.[0-9]+).*$,\1,')
     data["$benchmark,$vm_type,$thread"]=$throughput
   elif [[ $benchmark == "redis-benchmark" ]]; then
