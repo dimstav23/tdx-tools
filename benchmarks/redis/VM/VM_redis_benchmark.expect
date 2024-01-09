@@ -68,7 +68,7 @@ set socat_id $spawn_id
 
 # Run the memtier benchmark
 sleep 5
-spawn /bin/sh -c "numactl --cpunodebind=0 --membind=0 memtier_benchmark --port=$fwd_port --protocol=redis --hide-histogram -h localhost \
+spawn /bin/sh -c "numactl --cpunodebind=0 --membind=0 memtier_benchmark --port=$fwd_port --protocol=redis --hide-histogram -h localhost -d 1024 --pipeline 40 -c 100 \
                   | tail -n 8 | tee ${curr_dir}/../results/socat-${vm_type}_memtier-benchmark_${cores}_threads.txt"
 expect -- "$ "
 

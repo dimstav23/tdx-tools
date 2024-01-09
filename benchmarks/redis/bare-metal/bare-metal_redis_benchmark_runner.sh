@@ -54,7 +54,7 @@ function run_socat() {
 
 function run_memtier() {
   echo "Running memtier..."
-  $BIND0 memtier_benchmark --port=$1 --protocol=redis --hide-histogram \
+  $BIND0 memtier_benchmark --port=$1 --protocol=redis --hide-histogram -d 1024 --pipeline 40 -c 100 \
   | tail -n 8 | tee ./results/"$2"_memtier-benchmark_"$3"_threads.txt
 }
 
