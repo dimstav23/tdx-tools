@@ -61,7 +61,7 @@ python3 -W ignore $GENERATOR_SCRIPT -d ../tensorflow/results_gramine_tdx_1_6_1/:
 python3 -W ignore $GENERATOR_SCRIPT -d ../tensorflow/results_gramine_tdx_1_6_1/:../tensorflow/results_gramine_tdx_1_6_2/:../tensorflow/results_gramine_tdx_1_6_3/ -a tensorflow -e Bert -n absolute -m HIB -x threads -l "upper left" --error_bar -t tensorflow_error_bars
 python3 -W ignore $GENERATOR_SCRIPT -d ../tensorflow/results_gramine_tdx_1_6_1/:../tensorflow/results_gramine_tdx_1_6_2/:../tensorflow/results_gramine_tdx_1_6_3/ -a tensorflow -e Bert -n overhead -m HIB -x threads -l "upper left" -t tensorflow_overhead
 
-# redis
+# redis - redis-benchmark
 python3 -W ignore $GENERATOR_SCRIPT -d ../redis/results_gramine_tdx_1_6_1/ -a redis  -e GET,SET,LRANGE-300 -n absolute -m HIB -x threads -l "upper center" -t redis_single_res
 python3 -W ignore $GENERATOR_SCRIPT -d ../redis/results_gramine_tdx_1_6_1/:../redis/results_gramine_tdx_1_6_2/:../redis/results_gramine_tdx_1_6_3/ -a redis -e GET,SET,LRANGE-300 -n absolute -m HIB -x threads -l "upper center" -t redis
 python3 -W ignore $GENERATOR_SCRIPT -d ../redis/results_gramine_tdx_1_6_1/:../redis/results_gramine_tdx_1_6_2/:../redis/results_gramine_tdx_1_6_3/ -a redis -e GET,SET,LRANGE-300 -m HIB -x threads -l "upper center" -t redis_no_annot
@@ -72,6 +72,18 @@ python3 -W ignore $GENERATOR_SCRIPT -d ../redis/results_gramine_tdx_1_6_1/:../re
 python3 -W ignore $GENERATOR_SCRIPT -d ../redis/results_gramine_tdx_1_6_1/:../redis/results_gramine_tdx_1_6_2/:../redis/results_gramine_tdx_1_6_3/ -a redis -e GET,SET,LRANGE-300 -m HIB -x experiments -l "upper center" -t redis-experiments_no_annot
 python3 -W ignore $GENERATOR_SCRIPT -d ../redis/results_gramine_tdx_1_6_1/:../redis/results_gramine_tdx_1_6_2/:../redis/results_gramine_tdx_1_6_3/ -a redis -e GET,SET,LRANGE-300 -n absolute -m HIB -x experiments -l "upper center" --error_bar -t redis-experiments_error_bars
 python3 -W ignore $GENERATOR_SCRIPT -d ../redis/results_gramine_tdx_1_6_1/:../redis/results_gramine_tdx_1_6_2/:../redis/results_gramine_tdx_1_6_3/ -a redis -e GET,SET,LRANGE-300 -n overhead -m HIB -x experiments -l "upper center" -t redis-experiments_overhead
+
+# redis - memtier-benchmark
+python3 -W ignore $GENERATOR_SCRIPT -d ../redis/results_gramine_tdx_1_6_1/ -a redis  -e memtier-Get,memtier-Set -n absolute -m HIB -x threads -l "upper center" -t redis_memtier_single_res
+python3 -W ignore $GENERATOR_SCRIPT -d ../redis/results_gramine_tdx_1_6_1/:../redis/results_gramine_tdx_1_6_2/:../redis/results_gramine_tdx_1_6_3/ -a redis -e memtier-Get,memtier-Set -n absolute -m HIB -x threads -l "upper center" -t redis_memtier
+python3 -W ignore $GENERATOR_SCRIPT -d ../redis/results_gramine_tdx_1_6_1/:../redis/results_gramine_tdx_1_6_2/:../redis/results_gramine_tdx_1_6_3/ -a redis -e memtier-Get,memtier-Set -m HIB -x threads -l "upper center" -t redis_memtier_no_annot
+python3 -W ignore $GENERATOR_SCRIPT -d ../redis/results_gramine_tdx_1_6_1/:../redis/results_gramine_tdx_1_6_2/:../redis/results_gramine_tdx_1_6_3/ -a redis -e memtier-Get,memtier-Set -n absolute -m HIB -x threads -l "upper center" --error_bar -t redis_memtier_error_bars
+python3 -W ignore $GENERATOR_SCRIPT -d ../redis/results_gramine_tdx_1_6_1/:../redis/results_gramine_tdx_1_6_2/:../redis/results_gramine_tdx_1_6_3/ -a redis -e memtier-Get,memtier-Set -n overhead -m HIB -x threads -l "upper center" -t redis_memtier_overhead
+python3 -W ignore $GENERATOR_SCRIPT -d ../redis/results_gramine_tdx_1_6_1/ -a redis  -e memtier-Get,memtier-Set -n absolute -m HIB -x experiments -l "upper center" -t redis_memtier-experiments_single_res
+python3 -W ignore $GENERATOR_SCRIPT -d ../redis/results_gramine_tdx_1_6_1/:../redis/results_gramine_tdx_1_6_2/:../redis/results_gramine_tdx_1_6_3/ -a redis -e memtier-Get,memtier-Set -n absolute -m HIB -x experiments -l "upper center" -t redis_memtier-experiments
+python3 -W ignore $GENERATOR_SCRIPT -d ../redis/results_gramine_tdx_1_6_1/:../redis/results_gramine_tdx_1_6_2/:../redis/results_gramine_tdx_1_6_3/ -a redis -e memtier-Get,memtier-Set -m HIB -x experiments -l "upper center" -t redis_memtier-experiments_no_annot
+python3 -W ignore $GENERATOR_SCRIPT -d ../redis/results_gramine_tdx_1_6_1/:../redis/results_gramine_tdx_1_6_2/:../redis/results_gramine_tdx_1_6_3/ -a redis -e memtier-Get,memtier-Set -n absolute -m HIB -x experiments -l "upper center" --error_bar -t redis_memtier-experiments_error_bars
+python3 -W ignore $GENERATOR_SCRIPT -d ../redis/results_gramine_tdx_1_6_1/:../redis/results_gramine_tdx_1_6_2/:../redis/results_gramine_tdx_1_6_3/ -a redis -e memtier-Get,memtier-Set -n overhead -m HIB -x experiments -l "upper center" -t redis_memtier-experiments_overhead
 
 # memcached
 python3 -W ignore $GENERATOR_SCRIPT -d ../memcached/results_gramine_tdx_1_6_1/ -a memcached -e default -n absolute -m HIB -x threads -l "upper left" -t memcached_single_res
