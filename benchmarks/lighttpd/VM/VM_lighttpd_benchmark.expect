@@ -24,9 +24,9 @@ exec mkdir -p ${curr_dir}/../results
 
 # Start the guest VM
 if { $vm_type == "gramine-direct" || $vm_type == "gramine-sgx" } {
-  spawn sudo numactl --cpunodebind=0 --membind=0 $curr_dir/../../../start-qemu.sh -i $curr_dir/../../common/VM/td-guest-ubuntu-22.04.qcow2 -k $curr_dir/../../common/VM/vmlinuz -t sgx -b direct -c $cores -g $memory -u $epc_memory -l $lighttpd_port
+  spawn sudo numactl --cpunodebind=0 --membind=0 $curr_dir/../../../start-qemu.sh -i $curr_dir/../../common/VM/td-guest-ubuntu-22.04.qcow2 -k $curr_dir/../../common/VM/vmlinuz -t sgx -b direct -c $cores -g $memory -u $epc_memory -l
 } else {
-  spawn sudo numactl --cpunodebind=0 --membind=0 $curr_dir/../../../start-qemu.sh -i $curr_dir/../../common/VM/td-guest-ubuntu-22.04.qcow2 -k $curr_dir/../../common/VM/vmlinuz -t $vm_type -b direct -c $cores -g $memory -l $lighttpd_port
+  spawn sudo numactl --cpunodebind=0 --membind=0 $curr_dir/../../../start-qemu.sh -i $curr_dir/../../common/VM/td-guest-ubuntu-22.04.qcow2 -k $curr_dir/../../common/VM/vmlinuz -t $vm_type -b direct -c $cores -g $memory -l
 }
 set qemu_id $spawn_id
 
@@ -63,7 +63,8 @@ if { $vm_type == "gramine-direct" || $vm_type == "gramine-sgx" } {
 
 # Run socat
 sleep 5
-spawn numactl --cpunodebind=0 --membind=0 socat TCP4-LISTEN:$fwd_port,reuseaddr,fork,backlog=256,nodelay TCP-CONNECT:localhost:$lighttpd_port
+# WARNING: 192.168.22.76 is the IP assigned to our VM -- adapt it to your needs
+spawn numactl --cpunodebind=0 --membind=0 socat TCP4-LISTEN:$fwd_port,reuseaddr,fork,backlog=256,nodelay TCP-CONNECT:192.168.122.76:$lighttpd_port
 set socat_id $spawn_id
 
 # Run the client benchmark

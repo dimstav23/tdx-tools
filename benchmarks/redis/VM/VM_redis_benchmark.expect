@@ -23,9 +23,9 @@ exec mkdir -p ${curr_dir}/../results
 
 # Start the guest VM
 if { $vm_type == "gramine-direct" || $vm_type == "gramine-sgx" } {
-  spawn sudo numactl --cpunodebind=0 --membind=0 $curr_dir/../../../start-qemu.sh -i $curr_dir/../../common/VM/td-guest-ubuntu-22.04.qcow2 -k $curr_dir/../../common/VM/vmlinuz -t sgx -b direct -c $cores -g $memory -u $epc_memory -l $redis_port
+  spawn sudo numactl --cpunodebind=0 --membind=0 $curr_dir/../../../start-qemu.sh -i $curr_dir/../../common/VM/td-guest-ubuntu-22.04.qcow2 -k $curr_dir/../../common/VM/vmlinuz -t sgx -b direct -c $cores -g $memory -u $epc_memory -l
 } else {
-  spawn sudo numactl --cpunodebind=0 --membind=0 $curr_dir/../../../start-qemu.sh -i $curr_dir/../../common/VM/td-guest-ubuntu-22.04.qcow2 -k $curr_dir/../../common/VM/vmlinuz -t $vm_type -b direct -c $cores -g $memory -l $redis_port
+  spawn sudo numactl --cpunodebind=0 --membind=0 $curr_dir/../../../start-qemu.sh -i $curr_dir/../../common/VM/td-guest-ubuntu-22.04.qcow2 -k $curr_dir/../../common/VM/vmlinuz -t $vm_type -b direct -c $cores -g $memory -l
 }
 set qemu_id $spawn_id
 
@@ -62,18 +62,19 @@ if { $vm_type == "gramine-direct" || $vm_type == "gramine-sgx" } {
 
 # Run socat
 sleep 5
-spawn numactl --cpunodebind=0 --membind=0 socat TCP4-LISTEN:$fwd_port,reuseaddr,fork,backlog=256 TCP-CONNECT:localhost:$redis_port
+# WARNING: 192.168.22.76 is the IP assigned to our VM -- adapt it to your needs
+spawn numactl --cpunodebind=0 --membind=0 socat TCP4-LISTEN:$fwd_port,reuseaddr,fork,backlog=256 TCP-CONNECT:192.168.122.76:$redis_port
 set socat_id $spawn_id
 
 # Run the memtier benchmark
 sleep 5
-spawn /bin/sh -c "numactl --cpunodebind=0 --membind=0 memtier_benchmark --port=$fwd_port --protocol=redis --hide-histogram \
+spawn /bin/sh -c "numactl --cpunodebind=0 --membind=0 memtier_benchmark --port=$fwd_port --protocol=redis --hide-histogram -h localhost \
                   | tail -n 8 | tee ${curr_dir}/../results/socat-${vm_type}_memtier-benchmark_${cores}_threads.txt"
 expect -- "$ "
 
+# Run the redis-benchmark
 sleep 5
-
-spawn /bin/sh -c "numactl --cpunodebind=0 --membind=0 $redis_benchmark -q --csv -p $fwd_port \
+spawn /bin/sh -c "numactl --cpunodebind=0 --membind=0 $redis_benchmark -q --csv -p $fwd_port -h localhost \
                   | tail -n 20 | tee ${curr_dir}/../results/socat-${vm_type}_redis-benchmark_${cores}_threads.txt"
 expect -- "$ "
 

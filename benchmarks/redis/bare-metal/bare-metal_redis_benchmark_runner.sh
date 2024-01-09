@@ -25,7 +25,11 @@ mkdir -p results
 function run_redis() {
   echo "Running $1 redis-server..."
   rm -rf *.rdb # remove the leftovers from pervious runs
-  $BIND0 $1 ./redis-server &
+  if [ "$1" = "" ]; then
+    $BIND0 $1 ./redis-server --save "" --protected-mode no &
+  else
+    $BIND0 $1 ./redis-server &
+  fi
   if [ "$1" = "gramine-vm" ] || [ "$1" = "gramine-tdx" ]; then
     sleep 5
   else

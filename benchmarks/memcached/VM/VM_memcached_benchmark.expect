@@ -21,9 +21,9 @@ exec mkdir -p ${curr_dir}/../results
 
 # Start the guest VM
 if { $vm_type == "gramine-direct" || $vm_type == "gramine-sgx" } {
-  spawn sudo numactl --cpunodebind=0 --membind=0 $curr_dir/../../../start-qemu.sh -i $curr_dir/../../common/VM/td-guest-ubuntu-22.04.qcow2 -k $curr_dir/../../common/VM/vmlinuz -t sgx -b direct -c $cores -g $memory -u $epc_memory -l $memcached_port
+  spawn sudo numactl --cpunodebind=0 --membind=0 $curr_dir/../../../start-qemu.sh -i $curr_dir/../../common/VM/td-guest-ubuntu-22.04.qcow2 -k $curr_dir/../../common/VM/vmlinuz -t sgx -b direct -c $cores -g $memory -u $epc_memory -l
 } else {
-  spawn sudo numactl --cpunodebind=0 --membind=0 $curr_dir/../../../start-qemu.sh -i $curr_dir/../../common/VM/td-guest-ubuntu-22.04.qcow2 -k $curr_dir/../../common/VM/vmlinuz -t $vm_type -b direct -c $cores -g $memory -l $memcached_port
+  spawn sudo numactl --cpunodebind=0 --membind=0 $curr_dir/../../../start-qemu.sh -i $curr_dir/../../common/VM/td-guest-ubuntu-22.04.qcow2 -k $curr_dir/../../common/VM/vmlinuz -t $vm_type -b direct -c $cores -g $memory -l
 }
 set qemu_id $spawn_id
 
@@ -62,16 +62,11 @@ if { $vm_type == "gramine-direct" || $vm_type == "gramine-sgx" } {
 
 # Run socat
 sleep 5
-spawn numactl --cpunodebind=0 --membind=0 socat TCP4-LISTEN:$fwd_port,reuseaddr,fork,backlog=256 TCP-CONNECT:localhost:$memcached_port
+# WARNING: 192.168.22.76 is the IP assigned to our VM -- adapt it to your needs
+spawn numactl --cpunodebind=0 --membind=0 socat TCP4-LISTEN:$fwd_port,reuseaddr,fork,backlog=256 TCP-CONNECT:192.168.122.76:$memcached_port
 set socat_id $spawn_id
 
 # Run the memtier benchmark
-# w/o socat proxy
-# sleep 5
-# spawn /bin/sh -c "numactl --cpunodebind=0 --membind=0 memtier_benchmark --port=${memchached_port} --protocol=memcache_binary --hide-histogram \
-#                   | tail -n 8 | tee ${curr_dir}/../results/socat-${vm_type}_${cores}_threads.txt"
-# expect -- "$ "
-# w socat proxy
 sleep 5
 spawn /bin/sh -c "numactl --cpunodebind=0 --membind=0 memtier_benchmark --port=${fwd_port} --protocol=memcache_binary --hide-histogram \
                   | tail -n 8 | tee ${curr_dir}/../results/socat-${vm_type}_${cores}_threads.txt"

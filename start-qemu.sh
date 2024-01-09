@@ -51,7 +51,7 @@ DEBUG=false
 USE_VSOCK=false
 USE_SERIAL_CONSOLE=false
 FORWARD_PORT=10026
-EXTRA_FWD_PORT=""
+TAP_NETWORK=false
 MONITOR_PORT=9001
 ROOT_PARTITION="/dev/vda1"
 KERNEL_CMD_NON_TD="root=${ROOT_PARTITION} rw console=hvc0"
@@ -90,7 +90,6 @@ Usage: $(basename "$0") [OPTION]...
   -b [direct|grub]          Boot type, default is "direct" which requires kernel binary specified via "-k"
   -p <Monitor port>         Monitor via telnet
   -f <SSH Forward port>     Host port for forwarding guest SSH
-  -l <Forward port>         Additional port to be forwarded
   -o <OVMF file>            BIOS firmware device file, for "td" and "efi" VM only
   -m <11:22:33:44:55:66>    MAC address, impact TDX measurement RTMR
   -q [tdvmcall|vsock]       Support for TD quote using tdvmcall or vsock
@@ -102,6 +101,7 @@ Usage: $(basename "$0") [OPTION]...
   -a <DHCP start>           Network started address, default is "10.0.2.15"
   -e <extra kernel cmd>     Extra kernel command needed in VM boot
   -w <sha384 hex string>    pass customiszed 48*2 bytes MROWNERCONFIG to the vm, only support td
+  -l                        Flag to enable TAP networking
   -v                        Flag to enable vsock
   -d                        Flag to enable "debug=on" for GDB guest
   -s                        Flag to use serial console instead of HVC console
@@ -119,7 +119,7 @@ warn() {
 }
 
 process_args() {
-    while getopts ":i:k:t:b:p:f:l:o:a:m:vdshq:c:g:u:r:n:s:e:w:" option; do
+    while getopts ":i:k:t:b:p:f:o:a:m:lvdshq:c:g:u:r:n:s:e:w:" option; do
         case "$option" in
             i) GUEST_IMG=$OPTARG;;
             k) KERNEL=$OPTARG;;
@@ -127,7 +127,7 @@ process_args() {
             b) BOOT_TYPE=$OPTARG;;
             p) MONITOR_PORT=$OPTARG;;
             f) FORWARD_PORT=$OPTARG;;
-            l) EXTRA_FWD_PORT=$OPTARG;;
+            l) TAP_NETWORK=true;;
             o) OVMF=$OPTARG;;
             m) MAC_ADDR=$OPTARG;;
             v) USE_VSOCK=true;;
@@ -277,8 +277,8 @@ process_args() {
     fi
 
     # Set the network cidr, DHCP start address, and forward SSH port to the host 
-    if [[ -n ${EXTRA_FWD_PORT} ]]; then
-        QEMU_CMD+=" -netdev user,id=mynet0,net=$NET_CIDR,dhcpstart=$DHCP_START,hostfwd=tcp::$FORWARD_PORT-:22,hostfwd=tcp::$EXTRA_FWD_PORT-:$EXTRA_FWD_PORT "
+    if [[ ${TAP_NETWORK} == true ]]; then
+        QEMU_CMD+=" -netdev tap,id=mynet0,script=$CURR_DIR/qemu-ifup,downscript=$CURR_DIR/qemu-ifdown"
     else
         QEMU_CMD+=" -netdev user,id=mynet0,net=$NET_CIDR,dhcpstart=$DHCP_START,hostfwd=tcp::$FORWARD_PORT-:22 "
     fi
@@ -345,8 +345,8 @@ process_args() {
     if [[ -n ${MAC_ADDR} ]]; then
         echo "MAC Address       : ${MAC_ADDR}"
     fi
-    if [[ -n ${EXTRA_FWD_PORT} ]]; then
-        echo "Extra fwd port    : ${EXTRA_FWD_PORT}"
+    if [[ ${TAP_NETWORK} == true ]]; then
+        echo "TAP network    : ON"
     fi
     if [[ ${USE_SERIAL_CONSOLE} == true ]]; then
         QEMU_CMD+=" ${SERIAL_CONSOLE} "
