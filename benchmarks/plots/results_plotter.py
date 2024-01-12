@@ -122,7 +122,7 @@ class ResultsPlotter:
       axes.set_title(self.benchmark_app)
     else:
       if experiment.lower() == "bert": # custom fix for BERT capitalization in the title
-        experiment = "BERT"
+        experiment = "BERT Large"
       axes.set_title(self.benchmark_app + " - " + experiment)
     # return the bars for the annotation
     return bars
