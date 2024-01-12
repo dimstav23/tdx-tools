@@ -118,6 +118,8 @@ class ResultsPlotter:
         axes.set_title(self.benchmark_app + " - AlexNet")
       else:
         axes.set_title(self.benchmark_app)
+    elif self.benchmark_app == "Memcached" and experiment == "TOTAL": # custom fix for Memcached TOTAL experiment
+      axes.set_title(self.benchmark_app)
     else:
       if experiment.lower() == "bert": # custom fix for BERT capitalization in the title
         experiment = "BERT"
@@ -178,6 +180,10 @@ class ResultsPlotter:
       else:
         bars.append(axes.bar(x + x_spacing[i], bar_data, width=width, label=variant,
                         color = colour[i], hatch=hatch[i], edgecolor='black'))
+
+    # trick for memcached experiment titles
+    if self.benchmark_app == "Memcached":
+      x_axis_labels = [experiment.split('-')[0] for experiment in x_axis_labels]
 
     axes.set_xlabel('Workload')
     axes.set_xticks(range(0, len(x_axis_labels)), x_axis_labels)

@@ -86,11 +86,16 @@ python3 -W ignore $GENERATOR_SCRIPT -d ../redis/results_gramine_tdx_1_6_1/:../re
 python3 -W ignore $GENERATOR_SCRIPT -d ../redis/results_gramine_tdx_1_6_1/:../redis/results_gramine_tdx_1_6_2/:../redis/results_gramine_tdx_1_6_3/ -a redis -e memtier-Get,memtier-Set -n overhead -m HIB -x experiments -l "upper center" -t redis_memtier-experiments_overhead
 
 # memcached
-python3 -W ignore $GENERATOR_SCRIPT -d ../memcached/results_gramine_tdx_1_6_1/ -a memcached -e default -n absolute -m HIB -x threads -l "upper left" -t memcached_single_res
-python3 -W ignore $GENERATOR_SCRIPT -d ../memcached/results_gramine_tdx_1_6_1/:../memcached/results_gramine_tdx_1_6_2/:../memcached/results_gramine_tdx_1_6_3/ -a memcached -e default -n absolute -m HIB -x threads -l "upper left" -t memcached
-python3 -W ignore $GENERATOR_SCRIPT -d ../memcached/results_gramine_tdx_1_6_1/:../memcached/results_gramine_tdx_1_6_2/:../memcached/results_gramine_tdx_1_6_3/ -a memcached -e default -m HIB -x threads -l "upper left" -t memcached_no_annot
-python3 -W ignore $GENERATOR_SCRIPT -d ../memcached/results_gramine_tdx_1_6_1/:../memcached/results_gramine_tdx_1_6_2/:../memcached/results_gramine_tdx_1_6_3/ -a memcached -e default -n absolute -m HIB -x threads -l "upper left" --error_bar -t memcached_single_res
-python3 -W ignore $GENERATOR_SCRIPT -d ../memcached/results_gramine_tdx_1_6_1/:../memcached/results_gramine_tdx_1_6_2/:../memcached/results_gramine_tdx_1_6_3/ -a memcached -e default -n overhead -m HIB -x threads -l "upper left" -t memcached_overhead
+python3 -W ignore $GENERATOR_SCRIPT -d ../memcached/results_gramine_tdx_1_6_1/ -a memcached -e TOTAL -n absolute -m HIB -x threads -l "upper left" -t memcached_single_res
+python3 -W ignore $GENERATOR_SCRIPT -d ../memcached/results_gramine_tdx_1_6_1/:../memcached/results_gramine_tdx_1_6_2/:../memcached/results_gramine_tdx_1_6_3/ -a memcached -e TOTAL -n absolute -m HIB -x threads -l "upper left" -t memcached
+python3 -W ignore $GENERATOR_SCRIPT -d ../memcached/results_gramine_tdx_1_6_1/:../memcached/results_gramine_tdx_1_6_2/:../memcached/results_gramine_tdx_1_6_3/ -a memcached -e TOTAL -m HIB -x threads -l "upper left" -t memcached_no_annot
+python3 -W ignore $GENERATOR_SCRIPT -d ../memcached/results_gramine_tdx_1_6_1/:../memcached/results_gramine_tdx_1_6_2/:../memcached/results_gramine_tdx_1_6_3/ -a memcached -e TOTAL -n absolute -m HIB -x threads -l "upper left" --error_bar -t memcached_single_res
+python3 -W ignore $GENERATOR_SCRIPT -d ../memcached/results_gramine_tdx_1_6_1/:../memcached/results_gramine_tdx_1_6_2/:../memcached/results_gramine_tdx_1_6_3/ -a memcached -e TOTAL -n overhead -m HIB -x threads -l "upper left" -t memcached_overhead
+python3 -W ignore $GENERATOR_SCRIPT -d ../memcached/results_gramine_tdx_1_6_1/ -a memcached  -e GET-4,SET-4 -n absolute -m HIB -x experiments -l "upper right" -t memcached-experiments_single_res
+python3 -W ignore $GENERATOR_SCRIPT -d ../memcached/results_gramine_tdx_1_6_1/:../memcached/results_gramine_tdx_1_6_2/:../memcached/results_gramine_tdx_1_6_3/ -a memcached -e GET-4,SET-4 -n absolute -m HIB -x experiments -l "upper right" -t memcached-experiments
+python3 -W ignore $GENERATOR_SCRIPT -d ../memcached/results_gramine_tdx_1_6_1/:../memcached/results_gramine_tdx_1_6_2/:../memcached/results_gramine_tdx_1_6_3/ -a memcached -e GET-4,SET-4 -m HIB -x experiments -l "upper right" -t memcached-experiments_no_annot
+python3 -W ignore $GENERATOR_SCRIPT -d ../memcached/results_gramine_tdx_1_6_1/:../memcached/results_gramine_tdx_1_6_2/:../memcached/results_gramine_tdx_1_6_3/ -a memcached -e GET-4,SET-4 -n absolute -m HIB -x experiments -l "upper right" --error_bar -t memcached-experiments_error_bars
+python3 -W ignore $GENERATOR_SCRIPT -d ../memcached/results_gramine_tdx_1_6_1/:../memcached/results_gramine_tdx_1_6_2/:../memcached/results_gramine_tdx_1_6_3/ -a memcached -e GET-4,SET-4 -n overhead -m HIB -x experiments -l "upper right" -t memcached-experiments_overhead
 
 # Combined plots
 
