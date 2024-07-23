@@ -1,0 +1,3 @@
+[submodule "benchmarks/common/VM/tdx"]
+	path = benchmarks/common/VM/tdx
+	url = https://github.com/canonical/tdx.git
