@@ -11,18 +11,13 @@ set vm_type [lindex $argv 0];
 set cores [lindex $argv 1];
 # third argument indicates gigs of memory for the VM
 set memory [lindex $argv 2];
-# fourth argument indicates EPC memory for the VM (only for SGX vm_type)
-set epc_memory [lindex $argv 3];
 
 # time to run each experiment in seconds
 set experiment_time 20
 
 # Start the guest VM
-if { $vm_type == "gramine-direct" || $vm_type == "gramine-sgx" } {
-  spawn sudo numactl --cpunodebind=0 --membind=0 $curr_dir/../../../start-qemu.sh -i $curr_dir/../../common/VM/td-guest-ubuntu-22.04.qcow2 -k $curr_dir/../../common/VM/vmlinuz -t sgx -b direct -c $cores -g $memory -u $epc_memory
-} else {
-  spawn sudo numactl --cpunodebind=0 --membind=0 $curr_dir/../../../start-qemu.sh -i $curr_dir/../../common/VM/td-guest-ubuntu-22.04.qcow2 -k $curr_dir/../../common/VM/vmlinuz -t $vm_type -b direct -c $cores -g $memory 
-}
+spawn sudo numactl --cpunodebind=0 --membind=0 $curr_dir/../../common/VM/run_vm_td.sh -i $curr_dir/../../common/VM/tdx/guest-tools/image/tdx-guest-ubuntu-24.04-generic.qcow2 -t $vm_type -c $cores -g $memory 
+
 # Login process
 expect "login: "
 # Enter username
@@ -39,42 +34,21 @@ send -- "cd /root/examples/openvino\r"
 expect "# "
 # wait for the VM (especially the SGX-enabled) to be properly initialized
 sleep 20
-if { $vm_type == "gramine-direct" || $vm_type == "gramine-sgx" } {
-  # to ensure that the SGX key exists in the VM
-  send -- "gramine-sgx-gen-private-key\r"
-  expect -- "# "
-  send -- "make clean && make SGX=1\r"
-  expect -- "# "
-  send -- "KMP_AFFINITY=granularity=fine,noverbose,compact,1,0 numactl --cpubind=0 --membind=0 \
-  ${vm_type} benchmark_app \
-  -m model/public/resnet-50-tf/FP16/resnet-50-tf.xml \
-  -d CPU -b 1 -t ${experiment_time} -hint none \
-  -nstreams ${cores} -nthreads ${cores} -nireq ${cores} \
-  | tail -n 10 | tee ./results/RN50_vm-${vm_type}_${cores}_threads.txt\r"
-  # expect -- "# "
-  # send -- "KMP_AFFINITY=granularity=fine,noverbose,compact,1,0 numactl --cpubind=0 --membind=0 \
-  # ${vm_type} benchmark_app \
-  # -m model/intel/bert-large-uncased-whole-word-masking-squad-int8-0001/FP16-INT8/bert-large-uncased-whole-word-masking-squad-int8-0001.xml \
-  # -d CPU -b 1 -t ${experiment_time} -hint none \
-  # -nstreams ${cores} -nthreads ${cores} -nireq ${cores} \
-  # | tail -n 10 | tee ./results/Bert_vm-${vm_type}_${cores}_threads.txt\r"
-} else {
-  send -- "make clean && make benchmark_app\r"
-  expect -- "# "
-  send -- "KMP_AFFINITY=granularity=fine,noverbose,compact,1,0 numactl --cpubind=0 --membind=0 \
-  ./benchmark_app \
-  -m model/public/resnet-50-tf/FP16/resnet-50-tf.xml \
-  -d CPU -b 1 -t ${experiment_time} -hint none \
-  -nstreams ${cores} -nthreads ${cores} -nireq ${cores} \
-  | tail -n 10 | tee ./results/RN50_${vm_type}_${cores}_threads.txt\r"
-  # expect -- "# "
-  # send -- "KMP_AFFINITY=granularity=fine,noverbose,compact,1,0 numactl --cpubind=0 --membind=0 \
-  # ./benchmark_app \
-  # -m model/intel/bert-large-uncased-whole-word-masking-squad-int8-0001/FP16-INT8/bert-large-uncased-whole-word-masking-squad-int8-0001.xml \
-  # -d CPU -b 1 -t ${experiment_time} -hint none \
-  # -nstreams ${cores} -nthreads ${cores} -nireq ${cores} \
-  # | tail -n 10 | tee ./results/Bert_${vm_type}_${cores}_threads.txt\r"
-}
+send -- "make clean && make benchmark_app\r"
+expect -- "# "
+send -- "KMP_AFFINITY=granularity=fine,noverbose,compact,1,0 numactl --cpubind=0 --membind=0 \
+./benchmark_app \
+-m model/public/resnet-50-tf/FP16/resnet-50-tf.xml \
+-d CPU -b 1 -t ${experiment_time} -hint none \
+-nstreams ${cores} -nthreads ${cores} -nireq ${cores} \
+| tail -n 10 | tee ./results/RN50_${vm_type}_${cores}_threads.txt\r"
+# expect -- "# "
+# send -- "KMP_AFFINITY=granularity=fine,noverbose,compact,1,0 numactl --cpubind=0 --membind=0 \
+# ./benchmark_app \
+# -m model/intel/bert-large-uncased-whole-word-masking-squad-int8-0001/FP16-INT8/bert-large-uncased-whole-word-masking-squad-int8-0001.xml \
+# -d CPU -b 1 -t ${experiment_time} -hint none \
+# -nstreams ${cores} -nthreads ${cores} -nireq ${cores} \
+# | tail -n 10 | tee ./results/Bert_${vm_type}_${cores}_threads.txt\r"
 
 # expect the experiment to finish and poweroff the Guest VM
 expect "# "

@@ -11,8 +11,6 @@ set vm_type [lindex $argv 0];
 set cores [lindex $argv 1];
 # third argument indicates gigs of memory for the VM
 set memory [lindex $argv 2];
-# fourth argument indicates EPC memory for the VM (only for SGX vm_type)
-set epc_memory [lindex $argv 3];
 
 set redis_benchmark $curr_dir/../../common/bare-metal/deps/gramine/CI-Examples/redis/src/src/redis-benchmark
 
@@ -22,11 +20,8 @@ set fwd_port 6378
 exec mkdir -p ${curr_dir}/../results
 
 # Start the guest VM
-if { $vm_type == "gramine-direct" || $vm_type == "gramine-sgx" } {
-  spawn sudo numactl --cpunodebind=0 --membind=0 $curr_dir/../../../start-qemu.sh -i $curr_dir/../../common/VM/td-guest-ubuntu-22.04.qcow2 -k $curr_dir/../../common/VM/vmlinuz -t sgx -b direct -c $cores -g $memory -u $epc_memory -l
-} else {
-  spawn sudo numactl --cpunodebind=0 --membind=0 $curr_dir/../../../start-qemu.sh -i $curr_dir/../../common/VM/td-guest-ubuntu-22.04.qcow2 -k $curr_dir/../../common/VM/vmlinuz -t $vm_type -b direct -c $cores -g $memory -l
-}
+spawn sudo numactl --cpunodebind=0 --membind=0 $curr_dir/../../common/VM/run_vm_td.sh -i $curr_dir/../../common/VM/tdx/guest-tools/image/tdx-guest-ubuntu-24.04-generic.qcow2 -t $vm_type -c $cores -g $memory -l
+
 set qemu_id $spawn_id
 
 # Login process
@@ -45,20 +40,10 @@ send -- "cd /root/gramine/CI-Examples/redis\r"
 expect -- "# "
 # wait for the VM (especially the SGX-enabled) to be properly initialized
 sleep 20
-if { $vm_type == "gramine-direct" || $vm_type == "gramine-sgx" } {
-  # to ensure that the SGX key exists in the VM
-  send -- "gramine-sgx-gen-private-key\r"
-  expect -- "# "
-  send -- "make clean && make SGX=1\r"
-  expect -- "# "
-  send -- "$vm_type ./redis-server\r"
-  expect -- "\n"
-} else {
-  send -- "make clean && make\r"
-  expect -- "# "
-  send -- "./redis-server --save \"\" --protected-mode no\r"
-  expect -- "\n"
-}
+send -- "make clean && make\r"
+expect -- "# "
+send -- "./redis-server --save \"\" --protected-mode no\r"
+expect -- "\n"
 
 # Run socat
 sleep 5

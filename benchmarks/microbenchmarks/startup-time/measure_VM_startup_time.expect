@@ -18,10 +18,9 @@ for {set i 1} {$i<=$runs} {incr i} {
     foreach memory {1G 2G 4G 8G 16G 32G} {
       set fd [open "${results_dir}/${vm_type}_${memory}_${i}.txt" w]
 
-      spawn sudo $curr_dir/../../../start-qemu.sh \
-      -i $curr_dir/../../common/VM/td-guest-ubuntu-22.04.qcow2 \
-      -k $curr_dir/../../common/VM/vmlinuz \
-      -t $vm_type -b direct -c $cores -g $memory
+      spawn sudo $curr_dir/../../common/VM/run_vm_td.sh \
+      -i $curr_dir/../../common/VM/tdx/guest-tools/image/tdx-guest-ubuntu-24.04-generic.qcow2 \
+      -t $vm_type -c $cores -g $memory
 
       # Login process
       expect "login: "

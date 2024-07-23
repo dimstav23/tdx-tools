@@ -11,15 +11,10 @@ set vm_type [lindex $argv 0];
 set cores [lindex $argv 1];
 # third argument indicates gigs of memory for the VM
 set memory [lindex $argv 2];
-# fourth argument indicates EPC memory for the VM (only for SGX vm_type)
-set epc_memory [lindex $argv 3];
 
 # Start the guest VM
-if { $vm_type == "gramine-direct" || $vm_type == "gramine-sgx" } {
-  spawn sudo numactl --cpunodebind=0 --membind=0 $curr_dir/../../../start-qemu.sh -i $curr_dir/../../common/VM/td-guest-ubuntu-22.04.qcow2 -k $curr_dir/../../common/VM/vmlinuz -t sgx -b direct -c $cores -g $memory -u $epc_memory
-} else {
-  spawn sudo numactl --cpunodebind=0 --membind=0 $curr_dir/../../../start-qemu.sh -i $curr_dir/../../common/VM/td-guest-ubuntu-22.04.qcow2 -k $curr_dir/../../common/VM/vmlinuz -t $vm_type -b direct -c $cores -g $memory 
-}
+spawn sudo numactl --cpunodebind=0 --membind=0 $curr_dir/../../common/VM/run_vm_td.sh -i $curr_dir/../../common/VM/tdx/guest-tools/image/tdx-guest-ubuntu-24.04-generic.qcow2 -t $vm_type -c $cores -g $memory 
+
 # Login process
 expect "login: "
 # Enter username
@@ -36,72 +31,36 @@ send -- "cd /root/examples/tensorflow\r"
 expect "# "
 # wait for the VM (especially the SGX-enabled) to be properly initialized
 sleep 20
-if { $vm_type == "gramine-direct" || $vm_type == "gramine-sgx" } {
-  # to ensure that the SGX key exists in the VM
-  send -- "gramine-sgx-gen-private-key\r"
-  expect -- "# "
-  send -- "make clean && make SGX=1\r"
-  expect -- "# "
-  send -- "OMP_NUM_THREADS=${cores} KMP_AFFINITY=granularity=fine,verbose,compact,1,0 \
-  numactl --cpunodebind=0 --membind=0 ${vm_type} python \
-  models/models/language_modeling/tensorflow/bert_large/inference/run_squad.py \
-  --init_checkpoint=data/bert_large_checkpoints/model.ckpt-3649 \
-  --vocab_file=data/wwm_uncased_L-24_H-1024_A-16/vocab.txt \
-  --bert_config_file=data/wwm_uncased_L-24_H-1024_A-16/bert_config.json \
-  --predict_file=data/wwm_uncased_L-24_H-1024_A-16/dev-v1.1.json \
-  --precision=int8 --output_dir=output/bert-squad-output \
-  --predict_batch_size=32 \
-  --experimental_gelu=True \
-  --optimized_softmax=True \
-  --input_graph=data/fp32_bert_squad.pb \
-  --do_predict=True \
-  --mode=benchmark \
-  --inter_op_parallelism_threads=1 \
-  --intra_op_parallelism_threads=${cores} \
-  | tail -n 4 | tee ./results/Bert_vm-${vm_type}_${cores}_threads.txt\r"
-  # expect "# "
-  # send -- "OMP_NUM_THREADS=${cores} KMP_AFFINITY=granularity=fine,verbose,compact,1,0 \
-  # numactl --cpunodebind=0 --membind=0 ${vm_type} python \
-  # models/models/image_recognition/tensorflow/resnet50v1_5/inference/cpu/eval_image_classifier_inference.py \
-  # --input-graph=data/resnet50v1_5_int8_pretrained_model.pb \
-  # --num-inter-threads=1 \
-  # --num-intra-threads=${cores} \
-  # --batch-size=512 \
-  # --warmup-steps=50 \
-  # --steps=500 \
-  # | tail -n 4 | tee ./results/RN50_vm-${vm_type}_${cores}_threads.txt\r"
-} else {
-  send -- "make clean\r"
-  expect -- "# "
-  send -- "OMP_NUM_THREADS=${cores} KMP_AFFINITY=granularity=fine,verbose,compact,1,0 \
-  numactl --cpunodebind=0 --membind=0 python3 \
-  models/models/language_modeling/tensorflow/bert_large/inference/run_squad.py \
-  --init_checkpoint=data/bert_large_checkpoints/model.ckpt-3649 \
-  --vocab_file=data/wwm_uncased_L-24_H-1024_A-16/vocab.txt \
-  --bert_config_file=data/wwm_uncased_L-24_H-1024_A-16/bert_config.json \
-  --predict_file=data/wwm_uncased_L-24_H-1024_A-16/dev-v1.1.json \
-  --precision=int8 --output_dir=output/bert-squad-output \
-  --predict_batch_size=32 \
-  --experimental_gelu=True \
-  --optimized_softmax=True \
-  --input_graph=data/fp32_bert_squad.pb \
-  --do_predict=True \
-  --mode=benchmark \
-  --inter_op_parallelism_threads=1 \
-  --intra_op_parallelism_threads=${cores} \
-  | tail -n 4 | tee ./results/Bert_${vm_type}_${cores}_threads.txt\r"
-  # expect "# "
-  # send -- "OMP_NUM_THREADS=${cores} KMP_AFFINITY=granularity=fine,verbose,compact,1,0 \
-  # numactl --cpunodebind=0 --membind=0 python3 \
-  # models/models/image_recognition/tensorflow/resnet50v1_5/inference/cpu/eval_image_classifier_inference.py \
-  # --input-graph=data/resnet50v1_5_int8_pretrained_model.pb \
-  # --num-inter-threads=1 \
-  # --num-intra-threads=${cores} \
-  # --batch-size=512 \
-  # --warmup-steps=50 \
-  # --steps=500 \
-  # | tail -n 4 | tee ./results/RN50_${vm_type}_${cores}_threads.txt\r"
-}
+send -- "make clean\r"
+expect -- "# "
+send -- "OMP_NUM_THREADS=${cores} KMP_AFFINITY=granularity=fine,verbose,compact,1,0 \
+numactl --cpunodebind=0 --membind=0 python3 \
+models/models/language_modeling/tensorflow/bert_large/inference/run_squad.py \
+--init_checkpoint=data/bert_large_checkpoints/model.ckpt-3649 \
+--vocab_file=data/wwm_uncased_L-24_H-1024_A-16/vocab.txt \
+--bert_config_file=data/wwm_uncased_L-24_H-1024_A-16/bert_config.json \
+--predict_file=data/wwm_uncased_L-24_H-1024_A-16/dev-v1.1.json \
+--precision=int8 --output_dir=output/bert-squad-output \
+--predict_batch_size=32 \
+--experimental_gelu=True \
+--optimized_softmax=True \
+--input_graph=data/fp32_bert_squad.pb \
+--do_predict=True \
+--mode=benchmark \
+--inter_op_parallelism_threads=1 \
+--intra_op_parallelism_threads=${cores} \
+| tail -n 4 | tee ./results/Bert_${vm_type}_${cores}_threads.txt\r"
+# expect "# "
+# send -- "OMP_NUM_THREADS=${cores} KMP_AFFINITY=granularity=fine,verbose,compact,1,0 \
+# numactl --cpunodebind=0 --membind=0 python3 \
+# models/models/image_recognition/tensorflow/resnet50v1_5/inference/cpu/eval_image_classifier_inference.py \
+# --input-graph=data/resnet50v1_5_int8_pretrained_model.pb \
+# --num-inter-threads=1 \
+# --num-intra-threads=${cores} \
+# --batch-size=512 \
+# --warmup-steps=50 \
+# --steps=500 \
+# | tail -n 4 | tee ./results/RN50_${vm_type}_${cores}_threads.txt\r"
 
 # expect the experiment to finish and poweroff the Guest VM
 expect "# "
