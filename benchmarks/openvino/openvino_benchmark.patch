@@ -1,8 +1,8 @@
 diff --git a/openvino/Makefile b/openvino/Makefile
-index 945ef78..d024353 100644
+index 4a5ef25..a1d6585 100644
 --- a/openvino/Makefile
 +++ b/openvino/Makefile
-@@ -2,13 +2,13 @@
+@@ -3,13 +3,13 @@
  
  SHELL := /bin/bash # use bash syntax to activate virtual environment and to download models
  
@@ -18,7 +18,7 @@ index 945ef78..d024353 100644
  
  MODEL_DIR ?= $(THIS_DIR)/model
  
-@@ -22,7 +22,7 @@ PUBLIC_MODELS = \
+@@ -23,7 +23,7 @@ PUBLIC_MODELS = \
  	brain-tumor-segmentation-0002 \
  	ssd_mobilenet_v1_coco
  
@@ -27,7 +27,7 @@ index 945ef78..d024353 100644
  
  ifeq ($(DEBUG),1)
  GRAMINE_LOG_LEVEL = debug
-@@ -39,11 +39,11 @@ endif
+@@ -40,24 +40,24 @@ endif
  .PHONY: intel_models
  intel_models: $(VENV_DIR)/.INSTALLATION_OK
  	@source $(VENV_DIR)/bin/activate \
@@ -37,12 +37,13 @@ index 945ef78..d024353 100644
  		if [ ! -d $(abspath $(MODEL_DIR))/intel/$$model ]; then \
 -			python3 ./downloader.py --name $$model -o $(abspath $(MODEL_DIR)); \
 -			python3 ./converter.py --name $$model -d $(abspath $(MODEL_DIR)) -o $(abspath $(MODEL_DIR)); \
+-		fi; \
 +			python3 ./omz_downloader --name $$model -o $(abspath $(MODEL_DIR)); \
 +			python3 ./omz_converter --name $$model -d $(abspath $(MODEL_DIR)) -o $(abspath $(MODEL_DIR)); \
- 		fi; \
++ 		fi; \
  	done \
  	&& deactivate
-@@ -51,11 +51,11 @@ intel_models: $(VENV_DIR)/.INSTALLATION_OK
+ 
  .PHONY: public_models
  public_models: $(VENV_DIR)/.INSTALLATION_OK
  	@source $(VENV_DIR)/bin/activate \
@@ -52,12 +53,14 @@ index 945ef78..d024353 100644
  		if [ ! -d $(abspath $(MODEL_DIR))/public/$$model ]; then \
 -			python3 ./downloader.py --name $$model -o $(abspath $(MODEL_DIR)); \
 -			python3 ./converter.py --name $$model -d $(abspath $(MODEL_DIR)) -o $(abspath $(MODEL_DIR)); \
+-		fi; \
 +			python3 ./omz_downloader --name $$model -o $(abspath $(MODEL_DIR)); \
 +			python3 ./omz_converter --name $$model -d $(abspath $(MODEL_DIR)) -o $(abspath $(MODEL_DIR)); \
- 		fi; \
++ 		fi; \
  	done \
  	&& deactivate
-@@ -66,12 +66,6 @@ $(VENV_DIR)/.INSTALLATION_OK:
+ 
+@@ -67,12 +67,6 @@ $(VENV_DIR)/.INSTALLATION_OK:
  	python3 -m venv $(VENV_DIR) \
  	&& source $(VENV_DIR)/bin/activate \
  	&& pip install --upgrade pip \
@@ -70,7 +73,7 @@ index 945ef78..d024353 100644
  	&& deactivate \
  	&& touch $@
  
-@@ -80,7 +74,6 @@ benchmark_app.manifest: benchmark_app.manifest.template
+@@ -81,7 +75,6 @@ benchmark_app.manifest: benchmark_app.manifest.template
  		-Dlog_level=$(GRAMINE_LOG_LEVEL) \
  		-Darch_libdir=$(ARCH_LIBDIR) \
  		-Dopenvino_dir=$(abspath $(OPENVINO_DIR)) \
@@ -78,7 +81,7 @@ index 945ef78..d024353 100644
  		$< > $@
  
  # Make on Ubuntu <= 20.04 doesn't support "Rules with Grouped Targets" (`&:`),
-@@ -95,12 +88,8 @@ sgx_sign: benchmark_app.manifest | benchmark_app
+@@ -96,17 +89,13 @@ sgx_sign: benchmark_app.manifest | benchmark_app
  		--manifest $< \
  		--output $<.sgx
  
@@ -93,17 +96,18 @@ index 945ef78..d024353 100644
  
  .PHONY: clean
  clean:
-@@ -108,4 +97,4 @@ clean:
- 
+-	$(RM) *.manifest *.manifest.sgx *.token *.sig benchmark_app
+-
++	$(RM) -r $(MODEL_DIR) $(VENV_DIR)
++	
  .PHONY: distclean
  distclean: clean
--	$(RM) -r $(MODEL_DIR) $(VENV_DIR) $(INFERENCE_ENGINE_CPP_SAMPLES_BUILD)
-+	$(RM) -r $(MODEL_DIR) $(VENV_DIR)
+ 	$(RM) -r $(MODEL_DIR) $(VENV_DIR) $(INFERENCE_ENGINE_CPP_SAMPLES_BUILD)
 diff --git a/openvino/benchmark_app.manifest.template b/openvino/benchmark_app.manifest.template
-index 6f6fda6..688bf87 100644
+index d5e2404..54665ed 100644
 --- a/openvino/benchmark_app.manifest.template
 +++ b/openvino/benchmark_app.manifest.template
-@@ -5,19 +5,21 @@ libos.entrypoint = "benchmark_app"
+@@ -6,19 +6,21 @@ libos.entrypoint = "benchmark_app"
  
  loader.log_level = "{{ log_level }}"
  
@@ -126,9 +130,9 @@ index 6f6fda6..688bf87 100644
 +sys.stack.size = "1M"
 +
  sgx.enclave_size = "32G"
- sgx.max_threads = 196
+ sgx.max_threads = {{ '1' if env.get('EDMM', '0') == '1' else '196' }}
  sgx.edmm_enable = {{ 'true' if env.get('EDMM', '0') == '1' else 'false' }}
-@@ -30,12 +32,11 @@ sgx.trusted_files = [
+@@ -31,12 +33,11 @@ sgx.trusted_files = [
    "file:{{ gramine.libos }}",
    "file:{{ gramine.runtimedir() }}/",
    "file:{{ arch_libdir }}/",
@@ -145,7 +149,7 @@ index 6f6fda6..688bf87 100644
    "file:model/",
  ]
  
-@@ -46,4 +47,5 @@ sgx.allowed_files = [
+@@ -47,4 +48,5 @@ sgx.allowed_files = [
    "file:/etc/nsswitch.conf",
    "file:/etc/passwd",
    "file:output.txt",

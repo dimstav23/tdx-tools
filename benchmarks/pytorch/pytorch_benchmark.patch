@@ -1,233 +1,8 @@
-diff --git a/mongodb/.gitignore b/mongodb/.gitignore
-new file mode 100644
-index 0000000..66f588f
---- /dev/null
-+++ b/mongodb/.gitignore
-@@ -0,0 +1,2 @@
-+/data/db/*
-+!/data/db/.gitkeep
-diff --git a/mongodb/Makefile b/mongodb/Makefile
-new file mode 100644
-index 0000000..73c855f
---- /dev/null
-+++ b/mongodb/Makefile
-@@ -0,0 +1,37 @@
-+ARCH_LIBDIR ?= /lib/$(shell $(CC) -dumpmachine)
-+
-+ifeq ($(DEBUG),1)
-+GRAMINE_LOG_LEVEL = debug
-+else
-+GRAMINE_LOG_LEVEL = error
-+endif
-+
-+.PHONY: all
-+all: mongod.manifest
-+ifeq ($(SGX),1)
-+all: mongod.manifest.sgx mongod.sig
-+endif
-+
-+mongod.manifest: mongod.manifest.template
-+	gramine-manifest \
-+		-Dlog_level=$(GRAMINE_LOG_LEVEL) \
-+		-Darch_libdir=$(ARCH_LIBDIR) \
-+		-Dexecdir=$(shell dirname $(shell which mongod)) \
-+		$< $@
-+
-+# Make on Ubuntu <= 20.04 doesn't support "Rules with Grouped Targets" (`&:`)
-+mongod.sig mongod.manifest.sgx: sgx_sign
-+	@:
-+
-+.INTERMEDIATE: sgx_sign
-+sgx_sign: mongod.manifest
-+	gramine-sgx-sign \
-+		--manifest $< \
-+		--output $<.sgx
-+
-+.PHONY: clean
-+clean:
-+	$(RM) -rf *.token *.sig *.manifest *.manifest.sgx data/db/*
-+
-+.PHONY: distclean
-+distclean: clean
-diff --git a/mongodb/README.md b/mongodb/README.md
-new file mode 100644
-index 0000000..743bc3a
---- /dev/null
-+++ b/mongodb/README.md
-@@ -0,0 +1,70 @@
-+# MongoDB example
-+
-+This directory contains an example for running MongoDB in Gramine, including the
-+Makefile and a template for generating the manifest.
-+
-+# Generating the manifest
-+
-+## Installing prerequisites
-+
-+Please run the following commands to install MongoDB 7.0 Community Edition on Ubuntu 22.04:
-+
-+1. Import the public key used by the package management system:
-+
-+    1. From a terminal, install `gnupg` and `curl` if they are not already available:
-+       ```
-+       sudo apt-get install gnupg curl
-+       ```
-+
-+    2. Issue the following command to import the MongoDB public GPG Key from
-+       https://pgp.mongodb.com/server-7.0.asc:
-+       ```
-+       curl -fsSL https://pgp.mongodb.com/server-7.0.asc | \
-+           sudo gpg -o /usr/share/keyrings/mongodb-server-7.0.gpg --dearmor
-+       ```
-+
-+2. Create a list file for MongoDB:
-+   ```
-+   echo "deb [ arch=amd64,arm64 signed-by=/usr/share/keyrings/mongodb-server-7.0.gpg ] https://repo.mongodb.org/apt/ubuntu jammy/mongodb-org/7.0 multiverse" | \
-+       sudo tee /etc/apt/sources.list.d/mongodb-org-7.0.list
-+   ```
-+
-+3. Reload local package database:
-+   ```
-+   sudo apt-get update
-+   ```
-+
-+4. Install the MongoDB packages:
-+   ```
-+   sudo apt-get install -y mongodb-org
-+   ```
-+
-+## Building for Linux
-+
-+Run `make` (non-debug) or `make DEBUG=1` (debug) in the directory.
-+
-+## Building for SGX
-+
-+Run `make SGX=1` (non-debug) or `make SGX=1 DEBUG=1` (debug) in the directory.
-+
-+# Running MongoDB with Gramine
-+
-+Here's an example of running MongoDB under Gramine (note that command-line options are hardcoded in
-+the manifest file):
-+
-+Without SGX:
-+```
-+gramine-direct mongod
-+```
-+
-+With SGX:
-+```
-+gramine-sgx mongod
-+```
-+
-+# Testing client connection
-+
-+Run the below commands from a new terminal:
-+
-+- `mongosh scripts/insert.js` - inserts new documents into a collection
-+- `mongosh scripts/fetch.js` - fetches all documents, and prints their content
-diff --git a/mongodb/data/db/.gitkeep b/mongodb/data/db/.gitkeep
-new file mode 100644
-index 0000000..e69de29
-diff --git a/mongodb/mongod.manifest.template b/mongodb/mongod.manifest.template
-new file mode 100644
-index 0000000..7162eac
---- /dev/null
-+++ b/mongodb/mongod.manifest.template
-@@ -0,0 +1,40 @@
-+loader.entrypoint = "file:{{ gramine.libos }}"
-+libos.entrypoint = "{{ execdir }}/mongod"
-+
-+loader.log_level = "{{ log_level }}"
-+
-+loader.argv = ["mongod", "--nounixsocket"]
-+
-+loader.env.LD_LIBRARY_PATH = "/lib:/usr/{{ arch_libdir }}"
-+loader.env.PATH = "{{ execdir }}"
-+
-+fs.mounts = [
-+  { path = "/lib", uri = "file:{{ gramine.runtimedir() }}" },
-+  { path = "{{ execdir }}/mongod", uri = "file:{{ execdir }}/mongod" },
-+  { path = "/usr/{{ arch_libdir }}", uri = "file:/usr/{{ arch_libdir }}" },
-+  { path = "/data/db", uri = "file:data/db" },
-+]
-+
-+sgx.edmm_enable = {{ 'true' if env.get('EDMM', '0') == '1' else 'false' }}
-+sgx.enclave_size = "4G"
-+sgx.max_threads = 64
-+
-+sgx.trusted_files = [
-+  "file:{{ gramine.libos }}",
-+  "file:{{ execdir }}/mongod",
-+  "file:{{ gramine.runtimedir() }}/",
-+  "file:/usr/{{ arch_libdir }}/",
-+]
-+
-+sgx.allowed_files = [
-+  "file:data/db/",    # MongoDB data will be stored in plaintext; this is insecure!
-+]
-+
-+# MongoDB requires eventfd, and the Gramine implementation
-+# currently relies on the host in an insecure manner. This setting isn't
-+# suitable for production deployment, but works well as a stopgap during
-+# development while a proper implementation in Gramine is being worked on.
-+sys.insecure__allow_eventfd = true
-+
-+# BSD (flock) locks are currently experimental
-+sys.experimental__enable_flock = true
-diff --git a/mongodb/scripts/fetch.js b/mongodb/scripts/fetch.js
-new file mode 100644
-index 0000000..f01b7b6
---- /dev/null
-+++ b/mongodb/scripts/fetch.js
-@@ -0,0 +1,9 @@
-+const db = connect("mongodb://localhost:27017/mydatabase");
-+
-+const products = db.products;
-+
-+const cursor = products.find();
-+while (cursor.hasNext()) {
-+  const doc = cursor.next();
-+  printjson(doc);
-+}
-diff --git a/mongodb/scripts/insert.js b/mongodb/scripts/insert.js
-new file mode 100644
-index 0000000..b77394f
---- /dev/null
-+++ b/mongodb/scripts/insert.js
-@@ -0,0 +1,11 @@
-+const db = connect("mongodb://localhost:27017/mydatabase");
-+
-+const products = db.products;
-+
-+products.drop()
-+
-+products.insertMany([
-+  { item: "card", quantity: 25 },
-+  { item: "pen", quantity: 30 },
-+  { item: "lamp", quantity: 20 },
-+]);
-diff --git a/openjdk/java.manifest.template b/openjdk/java.manifest.template
-index 7965804..b72a5c9 100644
---- a/openjdk/java.manifest.template
-+++ b/openjdk/java.manifest.template
-@@ -21,9 +21,10 @@ sgx.enclave_size = "16G"
- # SGX needs minimum 64 threads for loading OpenJDK runtime.
- sgx.max_threads = 64
- 
--# `require_exinfo = true` is needed because OpenJDK queries fault info on page faults
- sgx.edmm_enable = {{ 'true' if env.get('EDMM', '0') == '1' else 'false' }}
--sgx.require_exinfo = {{ 'true' if env.get('EDMM', '0') == '1' else 'false' }}
-+
-+# `use_exinfo = true` is needed because OpenJDK queries fault info on page faults
-+sgx.use_exinfo = true
- 
- sgx.trusted_files = [
-   "file:{{ gramine.libos }}",
 diff --git a/pytorch/pytorch.manifest.template b/pytorch/pytorch.manifest.template
-index e3beeb7..1518725 100644
+index 830170e..99bd104 100644
 --- a/pytorch/pytorch.manifest.template
 +++ b/pytorch/pytorch.manifest.template
-@@ -10,9 +10,15 @@ loader.log_level = "{{ log_level }}"
+@@ -11,9 +11,15 @@ loader.log_level = "{{ log_level }}"
  loader.env.LD_LIBRARY_PATH = "/lib:/usr/lib:{{ arch_libdir }}:/usr/{{ arch_libdir }}"
  loader.env.HOME = "{{ env.HOME }}"
  
@@ -244,18 +19,18 @@ index e3beeb7..1518725 100644
  
  loader.insecure__use_cmdline_argv = true
  
-@@ -29,8 +35,8 @@ fs.mounts = [
+@@ -30,8 +36,8 @@ fs.mounts = [
    { type = "tmpfs", path = "/tmp" },
  ]
  
 -sgx.enclave_size = "4G"
--sgx.max_threads = 32
+-sgx.max_threads = {{ '1' if env.get('EDMM', '0') == '1' else '32' }}
 +sgx.enclave_size = "16G"
-+sgx.max_threads = 256
++sgx.max_threads = {{ '1' if env.get('EDMM', '0') == '1' else '256' }}
  sgx.edmm_enable = {{ 'true' if env.get('EDMM', '0') == '1' else 'false' }}
  
  sgx.trusted_files = [
-@@ -53,6 +59,7 @@ sgx.trusted_files = [
+@@ -54,6 +60,7 @@ sgx.trusted_files = [
  
  sgx.allowed_files = [
    "file:result.txt",

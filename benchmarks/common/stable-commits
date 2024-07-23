@@ -2,17 +2,18 @@
 # Repos/Branches/Commits for benchmark automation framework
 #
 
-# gramine commit
+# gramine commit - current version
 GRAMINE_GIT_URL="https://github.com/gramineproject/gramine.git"
-GRAMINE_COMMIT="2adc7d9bf22c0cb915657972bc49ddb653bda73d"
+GRAMINE_COMMIT="78776a5bf83a88843c3e1628224bcff2b36d4f3b"
 
-# gramine-tdx commit
+# gramine-tdx commit 
+# (currently directly set to specific branch - commit is not used)
 GRAMINE_TDX_GIT_URL="https://github.com/gramineproject/gramine-tdx.git"
-GRAMINE_TDX_COMMIT="f4405d38d1a3b5e45146e25d07f589ab31d4e006"
+GRAMINE_TDX_COMMIT="b6e97234ec8afce4a5fb6ce94aeea6869a3bb82e"
 
-# gramine examples commit
+# gramine examples commit - current version
 GRAMINE_EXAMPLES_GIT_URL="https://github.com/gramineproject/examples.git"
-GRAMINE_EXAMPLES_COMMIT="957f0617e1ada4489874d33f620ff0f82ef3aadb"
+GRAMINE_EXAMPLES_COMMIT="ceba8e9da926a3cf83d821ea78fb131a5b43ea9d"
 
 # SQLite commit -- depends on the package version
 SQLITE_GIT_URL="https://github.com/sqlite/sqlite.git"

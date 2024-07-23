@@ -96,7 +96,9 @@ else
   echo "Cloning Gramine-TDX"
   git clone ${GRAMINE_TDX_GIT_URL}
   cd $DEPS_DIR/gramine-tdx
-  git checkout ${GRAMINE_TDX_COMMIT}
+  # git checkout ${GRAMINE_TDX_COMMIT}
+  git checkout dimakuv/add-candle-rust-example
+  git cherry-pick 044937e548dc61532833f969ec43e8929e495c99
 fi
 
 cd $DEPS_DIR/gramine-tdx
@@ -114,7 +116,7 @@ fi
 
 # Set-up paths for the gramine installation directory
 export PATH=$DEPS_DIR/gramine/build-release/bin:$PATH
-export PYTHONPATH=$DEPS_DIR/gramine/build-release/lib/python3.10/site-packages:$PYTHONPATH
+export PYTHONPATH=$DEPS_DIR/gramine/build-release/lib/$(python3 -c 'import sys; print(f"python{sys.version_info.major}.{sys.version_info.minor}")')/site-packages:$PYTHONPATH
 export PKG_CONFIG_PATH=$DEPS_DIR/gramine/build-release/lib/x86_64-linux-gnu/pkgconfig:$PKG_CONFIG_PATH
 
 # Generate SGX private key if it does not exist
@@ -144,36 +146,47 @@ else
   # tensorflow
   echo "Setting up tensorflow..."
   mkdir -p tensorflow
-  cp $TF_MAKEFILE ./
-  cp $TF_MANIFEST_TEMPLATE ./
+  cp $TF_MAKEFILE ./tensorflow/
+  cp $TF_MANIFEST_TEMPLATE ./tensorflow/
 fi
 
 # Setup pytorch example
+cd $DEPS_DIR/examples/pytorch
 sudo apt install libnss-mdns libnss-myhostname -y
-sudo apt install python3-pip lsb-release -y
+sudo apt install python3-pip lsb-release python3 python3-venv -y
+python3 -m venv pytorch_env
+source pytorch_env/bin/activate
+python -m pip install --upgrade pip
 pip3 install torchvision pillow
 cd $DEPS_DIR/examples/pytorch
 if ! [ -f "alexnet-pretrained.pt" ]; then
   echo "Downloading the pre-trained model"
   python3 download-pretrained-model.py
 fi
+deactivate
 
 # Setup openvino example
-cd $DEPS_DIR/examples/openvino
-sudo apt install cmake python3 python3-venv -y
-python3 -m venv openvino_env
-source openvino_env/bin/activate
-python -m pip install --upgrade pip
-pip install openvino-dev[tensorflow,mxnet]==2022.3.1
-deactivate
-make SGX=1
+# cd $DEPS_DIR/examples/openvino
+# sudo apt install cmake python3 python3-venv python3-distutils-extra -y
+# python3 -m venv openvino_env
+# source openvino_env/bin/activate
+# python -m pip install --upgrade pip
+# pip install setuptools
+# pip install numpy==1.26.4
+# pip install openvino-dev[tensorflow,mxnet]==2024.1.0
+# deactivate
+# make SGX=1
 
 # Setup tensorflow example
 cd $DEPS_DIR/examples/tensorflow
 sudo apt install python3-pip -y
+python3 -m venv tensorflow_env
+source tensorflow_env/bin/activate
+python -m pip install --upgrade pip
 pip install tensorflow
 pip install psutil pandas
-pip install future --user
+pip install future
+deactivate
 make install-dependencies-ubuntu
 make SGX=1
 

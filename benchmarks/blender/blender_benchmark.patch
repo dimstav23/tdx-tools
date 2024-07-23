@@ -1,8 +1,8 @@
 diff --git a/CI-Examples/blender/Makefile b/CI-Examples/blender/Makefile
-index 17831aee..6a255a47 100644
+index b3830f94..5d6adb9f 100644
 --- a/CI-Examples/blender/Makefile
 +++ b/CI-Examples/blender/Makefile
-@@ -63,7 +63,7 @@ $(DATA_DIR)/images:
+@@ -66,7 +66,7 @@ $(DATA_DIR)/images:
  
  .PHONY: check
  check: all
@@ -12,25 +12,25 @@ index 17831aee..6a255a47 100644
  .PHONY: clean
  clean:
 diff --git a/CI-Examples/blender/blender.manifest.template b/CI-Examples/blender/blender.manifest.template
-index 14c8bb05..018e9354 100644
+index 900e9745..b63b0a9c 100644
 --- a/CI-Examples/blender/blender.manifest.template
 +++ b/CI-Examples/blender/blender.manifest.template
-@@ -23,8 +23,8 @@ fs.mounts = [
+@@ -25,8 +25,8 @@ fs.mounts = [
  sgx.debug = true
  sgx.edmm_enable = {{ 'true' if env.get('EDMM', '0') == '1' else 'false' }}
  sys.stack.size = "8M"
 -sgx.enclave_size = "2048M"
--sgx.max_threads = 64
+-sgx.max_threads = {{ '1' if env.get('EDMM', '0') == '1' else '64' }}
 +sgx.enclave_size = "4G"
-+sgx.max_threads = 512
++sgx.max_threads = {{ '1' if env.get('EDMM', '0') == '1' else '512' }}
  
  sgx.trusted_files = [
-   "file:{{ gramine.libos }}",
+   "file:{{ blender_dir }}/blender",
 diff --git a/CI-Examples/blender/test_all_scenes.sh b/CI-Examples/blender/test_all_scenes.sh
-index de087906..a2520890 100755
+index 90b7e003..e22982b0 100755
 --- a/CI-Examples/blender/test_all_scenes.sh
 +++ b/CI-Examples/blender/test_all_scenes.sh
-@@ -2,6 +2,9 @@
+@@ -5,6 +5,9 @@
  
  set -e
  
@@ -40,7 +40,7 @@ index de087906..a2520890 100755
  if test -n "$SGX"
  then
      GRAMINE=gramine-sgx
-@@ -9,10 +12,17 @@ else
+@@ -12,10 +15,17 @@ else
      GRAMINE=gramine-direct
  fi
  
@@ -54,8 +54,9 @@ index de087906..a2520890 100755
  do
      rm -f "$DATA_DIR"/images/"$i"0001.png
 -    $GRAMINE "../blender" -b /data/scenes/$i -t 4 -F PNG -o /data/images/$i -f 1
+-    # TODO add a better test, probably some diff with a precomputed image
 +    $GRAMINE "../blender" -b /data/scenes/$i -t $THREADS -F PNG -o /data/images/$i -f 1 \
 +        | grep "Saving" | tee ../results/"$VARIANT"_"$THREADS"_threads.txt
-     # TODO add a better test, probably some diff with a precomputed image
++     # TODO add a better test, probably some diff with a precomputed image
      [ -f "$DATA_DIR"/images/"$i"0001.png ]
  done
