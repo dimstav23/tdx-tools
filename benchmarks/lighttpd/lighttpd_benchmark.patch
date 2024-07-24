@@ -1,5 +1,5 @@
 diff --git a/CI-Examples/common_tools/benchmark-http.sh b/CI-Examples/common_tools/benchmark-http.sh
-index d5ab9025..503500b4 100755
+index d5ab9025..04754c4b 100755
 --- a/CI-Examples/common_tools/benchmark-http.sh
 +++ b/CI-Examples/common_tools/benchmark-http.sh
 @@ -11,16 +11,15 @@
@@ -24,7 +24,7 @@ index d5ab9025..503500b4 100755
  convert_throughput() {
      local THROUGHPUT_VAL=0
      local THROUGHPUT_UNIT=""
-@@ -72,12 +71,15 @@ latency_in_milliseconds() {
+@@ -72,11 +71,14 @@ latency_in_milliseconds() {
  RUN=0
  while [ $RUN -lt "$LOOP" ]
  do
@@ -36,13 +36,12 @@ index d5ab9025..503500b4 100755
 -        wrk -c "$CONNECTIONS" -d "$DURATION" -t "$CONCURRENCY" -R "$REQUESTS" "$DOWNLOAD_HOST/$DOWNLOAD_FILE" > OUTPUT || exit $?
 +        echo "wrk --timeout 5s -c $CLIENTS -d $DURATION -t $CONCURRENCY $DOWNLOAD_HOST/$DOWNLOAD_FILE"
 +        wrk --timeout 5s -c "$CLIENTS" -d "$DURATION" -t "$CONCURRENCY" "$DOWNLOAD_HOST/$DOWNLOAD_FILE" > OUTPUT || exit $?
- 
++
 +        FILENAME=$(echo $DOWNLOAD_FILE | cut -d '.' -f1 | cut -d '/' -f2)
 +        cp OUTPUT OUTPUT_clients_"$CLIENTS"_threads_"$CONCURRENCY"_"$FILENAME"
-+ 
+ 
          THROUGHPUT_STR=$(grep -m1 "Req/Sec" OUTPUT | awk '{ print $2 }')
          THROUGHPUT=$(convert_throughput "$THROUGHPUT_STR")
-         if [ "$THROUGHPUT" = "0" ]; then
 @@ -90,25 +92,32 @@ do
              echo "Latency is zero!"; exit 1;
          fi
@@ -54,7 +53,7 @@ index d5ab9025..503500b4 100755
 -            THROUGHPUTS[$CONCURRENCY]="${THROUGHPUTS[$CONCURRENCY]} $THROUGHPUT"
 -            LATENCIES[$CONCURRENCY]="${LATENCIES[$CONCURRENCY]} $LATENCY"
 +        TOTAL_THROUGHPUT_STR=$(grep -m1 "Requests/sec" OUTPUT | awk '{ print $2 }')
-+        TOTAL_THROUGHPUT=$(throughput_in_bytes "$TOTAL_THROUGHPUT_STR")
++        TOTAL_THROUGHPUT=$(convert_throughput "$TOTAL_THROUGHPUT_STR")
 +        if [ "$TOTAL_THROUGHPUT" = "0" ]; then
 +            echo "Total Throughput is zero!"; exit 1;
          fi

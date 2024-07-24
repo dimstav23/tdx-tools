@@ -21,7 +21,7 @@ set client_benchmark $curr_dir/../../common/bare-metal/deps/gramine/CI-Examples/
 exec mkdir -p ${curr_dir}/../results
 
 # Start the guest VM
-spawn sudo numactl --cpunodebind=0 --membind=0 $curr_dir/../../common/VM/run_vm_td.sh -i $curr_dir/../../common/VM/tdx/guest-tools/image/tdx-guest-ubuntu-24.04-generic.qcow2 -t $vm_type -c $cores -g $memory -l
+spawn sudo numactl --cpunodebind=0 --membind=0 $curr_dir/../../common/VM/run_vm_td.sh -i $curr_dir/../../common/VM/tdx/guest-tools/image/tdx-guest-ubuntu-24.04-generic.qcow2 -t $vm_type -c $cores -m $memory -l
 
 set qemu_id $spawn_id
 
@@ -45,6 +45,18 @@ send -- "make clean && make\r"
 expect -- "# "
 send -- "$lighttpd_install_dir/sbin/lighttpd -D -m $lighttpd_install_dir/lib -f lighttpd.conf\r"
 expect -- "\n"
+
+# Run the client benchmark
+# w/o socat
+sleep 5
+spawn /bin/sh -c "DOWNLOAD_FILE=random/100.1.html numactl --cpunodebind=0 --membind=0 $client_benchmark \
+                  http://192.168.122.76:$lighttpd_port \
+                  | tail -n 6 | tee ${curr_dir}/../results/${vm_type}_${cores}_threads_100.1.html.txt"
+expect -- "$ "
+spawn /bin/sh -c "DOWNLOAD_FILE=random/10K.1.html numactl --cpunodebind=0 --membind=0 $client_benchmark \
+                  http://192.168.122.76:$lighttpd_port \
+                  | tail -n 6 | tee ${curr_dir}/../results/${vm_type}_${cores}_threads_10K.1.html.txt"
+expect -- "$ "
 
 # Run socat
 sleep 5
@@ -70,21 +82,6 @@ expect -- "$ "
 
 # Close the socat process
 close -i $socat_id
-
-# w/o socat
-# sleep 5
-# spawn /bin/sh -c "DOWNLOAD_FILE=random/100.1.html numactl --cpunodebind=0 --membind=0 $client_benchmark \
-#                   http://127.0.0.1:$lighttpd_port \
-#                   | tail -n 6 | tee ${curr_dir}/../results/${vm_type}_${cores}_threads_100.1.html.txt"
-# expect -- "$ "
-# spawn /bin/sh -c "DOWNLOAD_FILE=random/10K.1.html numactl --cpunodebind=0 --membind=0 $client_benchmark \
-#                   http://127.0.0.1:$lighttpd_port \
-#                   | tail -n 6 | tee ${curr_dir}/../results/${vm_type}_${cores}_threads_10K.1.html.txt"
-# expect -- "$ "
-# spawn /bin/sh -c "DOWNLOAD_FILE=random/1M.1.html numactl --cpunodebind=0 --membind=0 $client_benchmark \
-#                   http://127.0.0.1:$lighttpd_port \
-#                   | tail -n 6 | tee ${curr_dir}/../results/${vm_type}_${cores}_threads_1M.1.html.txt"
-# expect -- "$ "
 
 # Cleanup phase
 # Close the qemu process
