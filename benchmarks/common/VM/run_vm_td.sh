@@ -51,10 +51,11 @@ NET_CIDR="10.0.2.0/24"
 DHCP_START="10.0.2.15"
 
 # Just log message of serial into file without input
-HVC_CONSOLE="-chardev stdio,id=mux,mux=on,logfile=$CURR_DIR/vm_log_$(date +"%FT%H%M").log \
+SETUP_CONSOLE="-chardev stdio,id=mux,mux=on,logfile=$CURR_DIR/vm_log_$(date +"%FT%H%M").log \
              -device virtio-serial,romfile= \
-             -device virtconsole,chardev=mux -monitor chardev:mux \
-             -serial chardev:mux"
+             -device virtconsole,chardev=mux"
+            #  -monitor chardev:mux \
+            #  -serial chardev:mux"
 PROCESS_NAME=run_vm_td
 LOGFILE='/tmp/tdx-guest-td.log'
 QUOTE_ARGS="-device vhost-vsock-pci,guest-cid=3"
@@ -192,7 +193,7 @@ process_args() {
     QEMU_CMD+=" -m ${MEM} "
 
     # Add the HVC console params
-    QEMU_CMD+=" ${HVC_CONSOLE} "
+    QEMU_CMD+=" ${SETUP_CONSOLE} "
 
     echo "========================================="
     echo "Guest Image       : ${GUEST_IMG}"
@@ -200,7 +201,6 @@ process_args() {
     echo "VM Type           : ${VM_TYPE}"
     echo "CPUS              : ${CPUS}"
     echo "Memory            : ${MEM}"
-    echo "Console           : HVC"
     
     if [[ -n ${MAC_ADDR} ]]; then
         echo "MAC Address       : ${MAC_ADDR}"
