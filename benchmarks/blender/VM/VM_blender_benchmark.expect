@@ -13,7 +13,7 @@ set cores [lindex $argv 1];
 set memory [lindex $argv 2];
 
 # Start the guest VM
-spawn numactl --cpunodebind=0 --membind=0 $curr_dir/../../common/VM/run_vm_td.sh -i $curr_dir/../../common/VM/tdx/guest-tools/image/tdx-guest-ubuntu-24.04-generic.qcow2 -t $vm_type -c $cores -m $memory 
+spawn sudo numactl --cpunodebind=0 --membind=0 $curr_dir/../../common/VM/run_vm_td.sh -i $curr_dir/../../common/VM/tdx/guest-tools/image/tdx-guest-ubuntu-24.04-generic.qcow2 -t $vm_type -c $cores -m $memory 
 
 # Login process
 expect "login: "
