@@ -35,7 +35,7 @@ git checkout ${GRAMINE_EXAMPLES_COMMIT}
 git apply /root/pytorch_benchmark.patch
 apt install libnss-mdns libnss-myhostname -y
 apt install python3-pip lsb-release -y
-pip3 install torchvision pillow
+pip3 install torchvision pillow --break-system-packages
 cd /root/examples/pytorch
 mkdir results
 python3 download-pretrained-model.py
@@ -51,16 +51,15 @@ mkdir results
 python3 -m venv openvino_env
 source openvino_env/bin/activate
 python -m pip install --upgrade pip
-pip install openvino-dev[tensorflow,mxnet]==2022.3.1
+pip install openvino
 deactivate
 make SGX=1
 
 # Setup the tensorflow example
 apt install unzip -y
 apt install python3-pip python-is-python3 -y
-pip install tensorflow
-pip install psutil pandas
-pip install future --user
+pip install tensorflow --break-system-packages
+pip install psutil pandas future --break-system-packages
 mkdir -p /root/examples/tensorflow
 cd /root/examples/tensorflow
 mkdir -p results

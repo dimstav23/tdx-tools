@@ -40,7 +40,7 @@ done
 
 if [[ ! -f ${INIT_SCRIPT} ]]; then
     echo "Please provide an existing init script or \
-use the default tdx-guest-stack.sh script"
+use the default vm_image_init.sh script"
     usage
     exit 1
 fi
@@ -61,15 +61,15 @@ if ! command -v "virt-customize" ; then
     exit 1
 fi
 
-if [[ ! -f ${TD_IMG} ]] ; then
-    pushd ${IMG_DIR}
-    sudo ./create-td-image.sh
-    popd
-fi
-
 if [[ ! -f ${CLOUD_IMG} ]] ; then
     pushd ${IMG_DIR}
     wget ${IMG_URL}
+    popd
+fi
+
+if [[ ! -f ${TD_IMG} ]] ; then
+    pushd ${IMG_DIR}
+    sudo ./create-td-image.sh
     popd
 fi
 
