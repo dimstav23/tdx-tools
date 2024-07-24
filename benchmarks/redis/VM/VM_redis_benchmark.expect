@@ -20,7 +20,7 @@ set fwd_port 6378
 exec mkdir -p ${curr_dir}/../results
 
 # Start the guest VM
-spawn sudo numactl --cpunodebind=0 --membind=0 $curr_dir/../../common/VM/run_vm_td.sh -i $curr_dir/../../common/VM/tdx/guest-tools/image/tdx-guest-ubuntu-24.04-generic.qcow2 -t $vm_type -c $cores -g $memory -l
+spawn sudo numactl --cpunodebind=0 --membind=0 $curr_dir/../../common/VM/run_vm_td.sh -i $curr_dir/../../common/VM/tdx/guest-tools/image/tdx-guest-ubuntu-24.04-generic.qcow2 -t $vm_type -c $cores -m $memory -l
 
 set qemu_id $spawn_id
 
@@ -39,11 +39,18 @@ send -- "cd /root/gramine/CI-Examples/redis\r"
 # Expect the cd to be done
 expect -- "# "
 # wait for the VM (especially the SGX-enabled) to be properly initialized
-sleep 20
+sleep 5
 send -- "make clean && make\r"
 expect -- "# "
 send -- "./redis-server --save \"\" --protected-mode no\r"
 expect -- "\n"
+
+# Run redis-benchmark without socat
+# WARNING: 192.168.22.76 is the IP assigned to our VM -- adapt it to your needs
+sleep 5
+spawn /bin/sh -c "numactl --cpunodebind=0 --membind=0 $redis_benchmark -q --csv -p $redis_port -h 192.168.122.76 \
+                  | tail -n 20 | tee ${curr_dir}/../results/${vm_type}_redis-benchmark_${cores}_threads.txt"
+expect -- "$ "
 
 # Run socat
 sleep 5
@@ -52,10 +59,10 @@ spawn numactl --cpunodebind=0 --membind=0 socat TCP4-LISTEN:$fwd_port,reuseaddr,
 set socat_id $spawn_id
 
 # Run the memtier benchmark
-sleep 5
-spawn /bin/sh -c "numactl --cpunodebind=0 --membind=0 memtier_benchmark --port=$fwd_port --protocol=redis --hide-histogram -h localhost -d 1024 --pipeline 40 -c 100 \
-                  | tail -n 8 | tee ${curr_dir}/../results/socat-${vm_type}_memtier-benchmark_${cores}_threads.txt"
-expect -- "$ "
+# sleep 5
+# spawn /bin/sh -c "numactl --cpunodebind=0 --membind=0 memtier_benchmark --port=$fwd_port --protocol=redis --hide-histogram -h localhost -d 1024 --pipeline 40 -c 100 \
+#                   | tail -n 8 | tee ${curr_dir}/../results/socat-${vm_type}_memtier-benchmark_${cores}_threads.txt"
+# expect -- "$ "
 
 # Run the redis-benchmark
 sleep 5
