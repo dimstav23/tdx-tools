@@ -14,9 +14,10 @@ set memory [lindex $argv 2];
 
 # time to run each experiment in seconds
 set experiment_time 20
+# RN50 shape info taken from here: https://docs.openvino.ai/2022.3/omz_models_model_resnet_50_tf.html
 
 # Start the guest VM
-spawn sudo numactl --cpunodebind=0 --membind=0 $curr_dir/../../common/VM/run_vm_td.sh -i $curr_dir/../../common/VM/tdx/guest-tools/image/tdx-guest-ubuntu-24.04-generic.qcow2 -t $vm_type -c $cores -g $memory 
+spawn sudo numactl --cpunodebind=0 --membind=0 $curr_dir/../../common/VM/run_vm_td.sh -i $curr_dir/../../common/VM/tdx/guest-tools/image/tdx-guest-ubuntu-24.04-generic.qcow2 -t $vm_type -c $cores -m $memory
 
 # Login process
 expect "login: "
@@ -33,22 +34,18 @@ send -- "cd /root/examples/openvino\r"
 # Expect the cd to be done
 expect "# "
 # wait for the VM (especially the SGX-enabled) to be properly initialized
-sleep 20
-send -- "make clean && make benchmark_app\r"
+sleep 5
+send -- "make clean && make\r"
 expect -- "# "
 send -- "KMP_AFFINITY=granularity=fine,noverbose,compact,1,0 numactl --cpubind=0 --membind=0 \
 ./benchmark_app \
--m model/public/resnet-50-tf/FP16/resnet-50-tf.xml \
+-m model/resnet_v1-50.xml \
 -d CPU -b 1 -t ${experiment_time} -hint none \
--nstreams ${cores} -nthreads ${cores} -nireq ${cores} \
-| tail -n 10 | tee ./results/RN50_${vm_type}_${cores}_threads.txt\r"
-# expect -- "# "
-# send -- "KMP_AFFINITY=granularity=fine,noverbose,compact,1,0 numactl --cpubind=0 --membind=0 \
-# ./benchmark_app \
-# -m model/intel/bert-large-uncased-whole-word-masking-squad-int8-0001/FP16-INT8/bert-large-uncased-whole-word-masking-squad-int8-0001.xml \
-# -d CPU -b 1 -t ${experiment_time} -hint none \
-# -nstreams ${cores} -nthreads ${cores} -nireq ${cores} \
-# | tail -n 10 | tee ./results/Bert_${vm_type}_${cores}_threads.txt\r"
+-nstreams ${cores} -nthreads ${cores} -nireq ${cores}"
+# the quotes in the next command made me do this split for clarity
+send -- { -shape "[1, 224, 224, 3] "}
+send -- "| tail -n 10 | tee ./results/RN50_${vm_type}_${cores}_threads.txt"
+send -- "\r"
 
 # expect the experiment to finish and poweroff the Guest VM
 expect "# "
