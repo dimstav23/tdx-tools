@@ -18,7 +18,7 @@ set fwd_port 11211
 exec mkdir -p ${curr_dir}/../results
 
 # Start the guest VM
-spawn sudo numactl --cpunodebind=0 --membind=0 $curr_dir/../../common/VM/run_vm_td.sh -i $curr_dir/../../common/VM/tdx/guest-tools/image/tdx-guest-ubuntu-24.04-generic.qcow2 -t $vm_type -c $cores -g $memory -l
+spawn sudo numactl --cpunodebind=0 --membind=0 $curr_dir/../../common/VM/run_vm_td.sh -i $curr_dir/../../common/VM/tdx/guest-tools/image/tdx-guest-ubuntu-24.04-generic.qcow2 -t $vm_type -c $cores -m $memory -l
 
 set qemu_id $spawn_id
 
@@ -37,13 +37,18 @@ send -- "cd /root/gramine/CI-Examples/memcached\r"
 # Expect the cd to be done
 expect -- "# "
 # wait for the VM (especially the SGX-enabled) to be properly initialized
-sleep 20
+sleep 5
 send -- "make clean && make\r"
 expect -- "# "
 # need to specify `-u root` here as memcached cannot run as root without it
 send -- "./memcached --port $memcached_port --threads=$cores -u root\r"
 expect -- "\n"
 
+# Run the memtier benchmark
+sleep 5
+spawn /bin/sh -c "numactl --cpunodebind=0 --membind=0 memtier_benchmark --host=192.168.122.76 --port=${memcached_port} --protocol=memcache_binary --hide-histogram \
+                  | tail -n 8 | tee ${curr_dir}/../results/${vm_type}_${cores}_threads.txt"
+expect -- "$ "
 
 # Run socat
 sleep 5
