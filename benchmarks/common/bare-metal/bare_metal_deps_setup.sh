@@ -70,9 +70,9 @@ else
   echo "Patching python..."
   cd $DEPS_DIR/gramine/CI-Examples/python
   git apply $PYTHON_PATCH
-  # lighttpd
+  # lighttpd - apply the patch on dir above because it affects common tools as well
   echo "Patching lighttpd..."
-  cd $DEPS_DIR/gramine/CI-Examples/lighttpd
+  cd $DEPS_DIR/gramine/CI-Examples
   git apply $LIGHTTPD_PATCH
 fi
 
@@ -154,39 +154,28 @@ fi
 cd $DEPS_DIR/examples/pytorch
 sudo apt install libnss-mdns libnss-myhostname -y
 sudo apt install python3-pip lsb-release python3 python3-venv -y
-python3 -m venv pytorch_env
-source pytorch_env/bin/activate
-python -m pip install --upgrade pip
-pip3 install torchvision pillow
+pip3 install torchvision pillow --break-system-packages
 cd $DEPS_DIR/examples/pytorch
 if ! [ -f "alexnet-pretrained.pt" ]; then
   echo "Downloading the pre-trained model"
   python3 download-pretrained-model.py
 fi
-deactivate
 
 # Setup openvino example
-# cd $DEPS_DIR/examples/openvino
-# sudo apt install cmake python3 python3-venv python3-distutils-extra -y
-# python3 -m venv openvino_env
-# source openvino_env/bin/activate
-# python -m pip install --upgrade pip
-# pip install setuptools
-# pip install numpy==1.26.4
-# pip install openvino-dev[tensorflow,mxnet]==2024.1.0
-# deactivate
-# make SGX=1
+cd $DEPS_DIR/examples/openvino
+sudo apt install cmake python3 python3-venv python3-distutils-extra -y
+python3 -m venv openvino_env
+source openvino_env/bin/activate
+python -m pip install --upgrade pip
+pip install openvino
+deactivate
+make SGX=1
 
 # Setup tensorflow example
 cd $DEPS_DIR/examples/tensorflow
 sudo apt install python3-pip -y
-python3 -m venv tensorflow_env
-source tensorflow_env/bin/activate
-python -m pip install --upgrade pip
-pip install tensorflow
-pip install psutil pandas
-pip install future
-deactivate
+pip install tensorflow --break-system-packages
+pip install psutil pandas future --break-system-packages
 make install-dependencies-ubuntu
 make SGX=1
 
