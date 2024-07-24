@@ -13,7 +13,7 @@ set cores [lindex $argv 1];
 set memory [lindex $argv 2];
 
 # Start the guest VM
-spawn sudo numactl --cpunodebind=0 --membind=0 $curr_dir/../../common/VM/run_vm_td.sh -i $curr_dir/../../common/VM/tdx/guest-tools/image/tdx-guest-ubuntu-24.04-generic.qcow2 -t $vm_type -c $cores -g $memory 
+spawn sudo numactl --cpunodebind=0 --membind=0 $curr_dir/../../common/VM/run_vm_td.sh -i $curr_dir/../../common/VM/tdx/guest-tools/image/tdx-guest-ubuntu-24.04-generic.qcow2 -t $vm_type -c $cores -m $memory
 
 # Login process
 expect "login: "
@@ -30,7 +30,7 @@ send -- "cd /root/examples/tensorflow\r"
 # Expect the cd to be done
 expect "# "
 # wait for the VM (especially the SGX-enabled) to be properly initialized
-sleep 20
+sleep 5
 send -- "make clean\r"
 expect -- "# "
 send -- "OMP_NUM_THREADS=${cores} KMP_AFFINITY=granularity=fine,verbose,compact,1,0 \
