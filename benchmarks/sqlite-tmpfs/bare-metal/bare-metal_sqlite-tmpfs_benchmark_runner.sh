@@ -43,20 +43,9 @@ CURR_PKG_CONFIG_PATH=$PKG_CONFIG_PATH
 
 # Run the bare-metal (bm) gramine-direct and gramine-sgx case
 export PATH=$GRAMINE_SGX_INSTALL_DIR/bin:$CURR_PATH
-export PYTHONPATH=$GRAMINE_SGX_INSTALL_DIR/lib/python3.10/site-packages:$CURR_PYTHONPATH
+export PYTHONPATH=$GRAMINE_SGX_INSTALL_DIR/lib/$(python3 -c 'import sys; print(f"python{sys.version_info.major}.{sys.version_info.minor}")')/site-packages:$CURR_PYTHONPATH
 export PKG_CONFIG_PATH=$GRAMINE_SGX_INSTALL_DIR/lib/x86_64-linux-gnu/pkgconfig:$CURR_PKG_CONFIG_PATH
 make clean && make SGX=1
-# for THREAD_CNT in "${THREADS[@]}"; do
-#   # db init process is embedded in kvtest.c
-#   numactl --cpunodebind=0 --membind=0 gramine-direct kvtest run db/test.db --count 500k --stats \
-#   | tail -n 4 | tee ./results/read_bm-gramine-direct_"$THREAD_CNT"_threads.txt
-#   numactl --cpunodebind=0 --membind=0 gramine-direct kvtest run db/test.db --count 500k --stats --random \
-#   | tail -n 4 | tee ./results/read-random_bm-gramine-direct_"$THREAD_CNT"_threads.txt
-#   numactl --cpunodebind=0 --membind=0 gramine-direct kvtest run db/test.db --count 500k --stats --update \
-#   | tail -n 4 | tee ./results/update_bm-gramine-direct_"$THREAD_CNT"_threads.txt
-#   numactl --cpunodebind=0 --membind=0 gramine-direct kvtest run db/test.db --count 500k --stats --update --random \
-#   | tail -n 4 | tee ./results/update-random_bm-gramine-direct_"$THREAD_CNT"_threads.txt
-# done
 for THREAD_CNT in "${THREADS[@]}"; do
   # db init process is embedded in kvtest.c
   numactl --cpunodebind=0 --membind=0 gramine-sgx kvtest run db/test.db --count 500k --stats \
@@ -71,7 +60,7 @@ done
 
 # Run the gramine-vm and gramine-tdx case
 export PATH=$GRAMINE_TDX_INSTALL_DIR/bin:$CURR_PATH
-export PYTHONPATH=$GRAMINE_TDX_INSTALL_DIR/lib/python3.10/site-packages:$CURR_PYTHONPATH
+export PYTHONPATH=$GRAMINE_TDX_INSTALL_DIR/lib/$(python3 -c 'import sys; print(f"python{sys.version_info.major}.{sys.version_info.minor}")')/site-packages:$CURR_PYTHONPATH
 export PKG_CONFIG_PATH=$GRAMINE_TDX_INSTALL_DIR/lib/x86_64-linux-gnu/pkgconfig:$CURR_PKG_CONFIG_PATH
 make clean && make SGX=1
 for THREAD_CNT in "${THREADS[@]}"; do
