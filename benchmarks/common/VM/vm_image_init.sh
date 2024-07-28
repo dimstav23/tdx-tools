@@ -25,11 +25,32 @@ ninja -C build/ install
 export PATH="/usr/local/bin/:$PATH" # to identify the gramine binaries
 gramine-sgx-gen-private-key
 
+# Get gramine-tdx for the candle example
+# we need the gramine-tdx specifically for that
+cd /root
+git clone ${GRAMINE_TDX_GIT_URL}
+cd /root/gramine-tdx
+git checkout dimakuv/add-candle-rust-example
+git cherry-pick 044937e548dc61532833f969ec43e8929e495c99
+
+# Setup the candle example
+apt install cargo -y
+mkdir -p /root/gramine-tdx/CI-Examples/candle/results
+cd /root/gramine-tdx/CI-Examples/candle
+make SGX=1
+
 #Get the Gramine examples
 cd /root
 git clone ${GRAMINE_EXAMPLES_GIT_URL}
 cd /root/examples
 git checkout ${GRAMINE_EXAMPLES_COMMIT}
+# cherry pick commits that add the Go and Java benchmarks
+git remote add new_benchmarks https://github.com/dimstav23/gramine-examples.git
+git fetch new_benchmarks
+git cherry-pick 04ee033f986310d9822cb1cbd8a1d9087065498a
+git cherry-pick 333301f03d662bca5d78ad398c052b643f40cf9b
+git cherry-pick 818ecfb2a1ff2f71c46b951169608dcef5f7b829
+git cherry-pick 5b13d3b65774213c18b3c6aca923b609fde4187d
 
 #Setup the pytorch example
 git apply /root/pytorch_benchmark.patch
@@ -67,6 +88,20 @@ cp /root/Makefile ./
 cp /root/python.manifest.template ./
 make distclean
 make install-dependencies-ubuntu
+make SGX=1
+
+# Setup the go bild example
+apt install golang -y
+cd /root/examples/bild
+git apply /root/bild_benchmark.patch
+mkdir -p results
+make SGX=1
+
+# Setup the Java image processing example
+apt install openjdk-21-jdk -y
+cd /root/examples/java_image
+git apply /root/java_image_benchmark.patch
+mkdir -p results
 make SGX=1
 
 # Apply the benchmark patches in the CI-Examples and build them (if needed)
