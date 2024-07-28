@@ -4,9 +4,16 @@ described [here](./common/bare-metal/README.md) (for bare-metal runs) and [here]
 
 Also, your machine should support Intel-TDX and Intel-SGX to run the benchmarks seamlessly.
 
-Additionally, make sure that your user has passwordless `sudo` rights to avoid any issues.
+Additionally, make sure that your user has **passwordless** `sudo` rights to avoid any issues.
 
-You can run all the benchmarks like this:
+Lastly, you should have installed [`memtier_benchmark`](https://github.com/RedisLabs/memtier_benchmark) in your system for the networking experiments.
+
+
+After making sure that everything in the setup process went smoothly, you can run all the benchmarks like this:
 ```
 $ ./artifact_evaluation.sh
 ``` 
+
+
+**Notes**:
+- Currently, for `gramine-tdx` we use a specific branch and cherry picking a specific commit that adds support for the `rust`, `java` and `go` examples. For precise branch and commit hash informatio, check [this file](./common/bare-metal/bare_metal_deps_setup.sh).
