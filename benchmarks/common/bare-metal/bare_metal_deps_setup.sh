@@ -13,6 +13,9 @@ SQLITE_TMPFS_PATCH=$THIS_DIR/../../sqlite-tmpfs/sqlite-tmpfs_benchmark.patch
 OPENVINO_PATCH=$THIS_DIR/../../openvino/openvino_benchmark.patch
 PYTHON_PATCH=$THIS_DIR/../../python/python_benchmark.patch
 LIGHTTPD_PATCH=$THIS_DIR/../../lighttpd/lighttpd_benchmark.patch
+CANDLE_PATCH=$THIS_DIR/../../candle/candle_benchmark.patch
+BILD_PATCH=$THIS_DIR/../../bild/bild_benchmark.patch
+JAVA_IMAGE_PATCH=$THIS_DIR/../../java_image/java_image_benchmark.patch
 TF_MAKEFILE=$THIS_DIR/../../tensorflow/Makefile
 TF_MANIFEST_TEMPLATE=$THIS_DIR/../../tensorflow/python.manifest.template
 
@@ -30,6 +33,7 @@ sudo apt install python3-jinja2 python3-pip python3-pyelftools wget -y
 sudo apt install meson python3-tomli python3-tomli-w -y
 sudo apt install libprotobuf-c-dev protobuf-c-compiler protobuf-compiler -y
 sudo apt install python3-cryptography python3-pip python3-protobuf -y
+sudo apt install cargo -y
 
 # Download, build and install gramine-sgx
 cd $DEPS_DIR
@@ -99,6 +103,10 @@ else
   # git checkout ${GRAMINE_TDX_COMMIT}
   git checkout dimakuv/add-candle-rust-example
   git cherry-pick 044937e548dc61532833f969ec43e8929e495c99
+  # Candle
+  echo "Patching candle..."
+  cd $DEPS_DIR/gramine-tdx/CI-Examples/candle
+  git apply $CANDLE_PATCH
 fi
 
 cd $DEPS_DIR/gramine-tdx
@@ -135,6 +143,14 @@ else
   cd $DEPS_DIR/examples
   git checkout ${GRAMINE_EXAMPLES_COMMIT}
 
+  # cherry pick commits that add the Go and Java benchmarks
+  git remote add new_benchmarks https://github.com/dimstav23/gramine-examples.git
+  git fetch new_benchmarks
+  git cherry-pick 04ee033f986310d9822cb1cbd8a1d9087065498a
+  git cherry-pick 333301f03d662bca5d78ad398c052b643f40cf9b
+  git cherry-pick 818ecfb2a1ff2f71c46b951169608dcef5f7b829
+  git cherry-pick 5b13d3b65774213c18b3c6aca923b609fde4187d
+
   # pytorch
   echo "Patching pytorch..."
   git apply $PYTORCH_PATCH
@@ -142,6 +158,14 @@ else
   # openvino
   echo "Patching openvino..."
   git apply $OPENVINO_PATCH
+
+  # bild
+  echo "Patching bild..."
+  git apply $BILD_PATCH
+
+  # java_image
+  echo "Patching java image..."
+  git apply $JAVA_IMAGE_PATCH
 
   # tensorflow
   echo "Setting up tensorflow..."
@@ -177,6 +201,16 @@ sudo apt install python3-pip -y
 pip install tensorflow --break-system-packages
 pip install psutil pandas future --break-system-packages
 make install-dependencies-ubuntu
+make SGX=1
+
+# Setup bild example
+apt install golang -y
+cd $DEPS_DIR/examples/bild
+make SGX=1
+
+# Setup java image example
+apt install openjdk-21-jdk -y
+cd $DEPS_DIR/examples/java_image
 make SGX=1
 
 # Build the CI-Examples (if needed)
@@ -220,4 +254,7 @@ make SGX=1
 # lighttpd
 sudo apt install build-essential libssl-dev zlib1g-dev wrk -y
 cd $DEPS_DIR/gramine/CI-Examples/lighttpd
+make SGX=1
+# candle
+cd $DEPS_DIR/gramine-tdx/CI-Examples/candle
 make SGX=1
