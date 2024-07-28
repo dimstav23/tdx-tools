@@ -4,7 +4,7 @@
 
 # gramine commit - current version
 GRAMINE_GIT_URL="https://github.com/gramineproject/gramine.git"
-GRAMINE_COMMIT="78776a5bf83a88843c3e1628224bcff2b36d4f3b"
+GRAMINE_COMMIT="ca715b9ca1addd4d846975d5f4a2d1d58804f2b9"
 
 # gramine-tdx commit 
 # (currently directly set to specific branch - commit is not used)
