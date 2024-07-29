@@ -51,10 +51,12 @@ export PKG_CONFIG_PATH=$GRAMINE_TDX_INSTALL_DIR/lib/x86_64-linux-gnu/pkgconfig:$
 make clean
 make SGX=1
 for THREAD_CNT in "${THREADS[@]}"; do
+  export QEMU_CPU_NUM=$THREAD_CNT
   NUM_THREADS=$THREAD_CNT numactl --cpunodebind=0 --membind=0 gramine-vm java ImageProcessing input.png \
   | tail -n 3 | tee ./results/gramine-vm_"$THREAD_CNT"_threads.txt
 done
 for THREAD_CNT in "${THREADS[@]}"; do
+  export QEMU_CPU_NUM=$THREAD_CNT
   NUM_THREADS=$THREAD_CNT numactl --cpunodebind=0 --membind=0 gramine-tdx java ImageProcessing input.png \
   | tail -n 3 | tee ./results/gramine-tdx_"$THREAD_CNT"_threads.txt
 done
