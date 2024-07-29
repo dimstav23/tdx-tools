@@ -5,6 +5,27 @@ set -e
 THIS_DIR=$(dirname "$(readlink -f "$0")")
 GENERATOR_SCRIPT=$THIS_DIR/generate_plots.py
 
+# bild
+python3 -W ignore $GENERATOR_SCRIPT -d ../bild/results_gramine_tdx_1_6_1/ -a bild -e default -n absolute -m LIB -x threads -l "upper right" -t bild_single_res
+python3 -W ignore $GENERATOR_SCRIPT -d ../bild/results_gramine_tdx_1_6_1/ -a bild -e default -n absolute -m LIB -x threads -l "upper right" -t bild
+python3 -W ignore $GENERATOR_SCRIPT -d ../bild/results_gramine_tdx_1_6_1/ -a bild -e default -m LIB -x threads -l "upper right" -t bild_no_annot
+python3 -W ignore $GENERATOR_SCRIPT -d ../bild/results_gramine_tdx_1_6_1/ -a bild -e default -n absolute -m LIB -x threads -l "upper right" --error_bar -t bild_error_bars
+python3 -W ignore $GENERATOR_SCRIPT -d ../bild/results_gramine_tdx_1_6_1/ -a bild -e default -n overhead -m LIB -x threads -l "upper right" -t bild_overhead
+
+# java_image
+python3 -W ignore $GENERATOR_SCRIPT -d ../java_image/results_gramine_tdx_1_6_1/ -a java_image -e default -n absolute -m LIB -x threads -l "upper right" -t java_image_single_res
+python3 -W ignore $GENERATOR_SCRIPT -d ../java_image/results_gramine_tdx_1_6_1/ -a java_image -e default -n absolute -m LIB -x threads -l "upper right" -t java_image
+python3 -W ignore $GENERATOR_SCRIPT -d ../java_image/results_gramine_tdx_1_6_1/ -a java_image -e default -m LIB -x threads -l "upper right" -t java_image_no_annot
+python3 -W ignore $GENERATOR_SCRIPT -d ../java_image/results_gramine_tdx_1_6_1/ -a java_image -e default -n absolute -m LIB -x threads -l "upper right" --error_bar -t java_image_error_bars
+python3 -W ignore $GENERATOR_SCRIPT -d ../java_image/results_gramine_tdx_1_6_1/ -a java_image -e default -n overhead -m LIB -x threads -l "upper right" -t java_image_overhead
+
+# candle
+python3 -W ignore $GENERATOR_SCRIPT -d ../candle/results_gramine_tdx_1_6_1/ -a candle -e default -n absolute -m HIB -x threads -l "upper right" -t candle_single_res
+python3 -W ignore $GENERATOR_SCRIPT -d ../candle/results_gramine_tdx_1_6_1/ -a candle -e default -n absolute -m HIB -x threads -l "upper right" -t candle
+python3 -W ignore $GENERATOR_SCRIPT -d ../candle/results_gramine_tdx_1_6_1/ -a candle -e default -m HIB -x threads -l "upper right" -t candle_no_annot
+python3 -W ignore $GENERATOR_SCRIPT -d ../candle/results_gramine_tdx_1_6_1/ -a candle -e default -n absolute -m HIB -x threads -l "upper right" --error_bar -t candle_error_bars
+python3 -W ignore $GENERATOR_SCRIPT -d ../candle/results_gramine_tdx_1_6_1/ -a candle -e default -n overhead -m HIB -x threads -l "upper right" -t candle_overhead
+
 # blender
 python3 -W ignore $GENERATOR_SCRIPT -d ../blender/results_gramine_tdx_1_6_1/ -a blender -e default -n absolute -m LIB -x threads -l "upper right" -t blender_single_res
 python3 -W ignore $GENERATOR_SCRIPT -d ../blender/results_gramine_tdx_1_6_1/:../blender/results_gramine_tdx_1_6_2/:../blender/results_gramine_tdx_1_6_3/ -a blender -e default -n absolute -m LIB -x threads -l "upper right" -t blender
@@ -19,12 +40,12 @@ python3 -W ignore $GENERATOR_SCRIPT -d ../lighttpd/results_gramine_tdx_1_6_1/:..
 python3 -W ignore $GENERATOR_SCRIPT -d ../lighttpd/results_gramine_tdx_1_6_1/:../lighttpd/results_gramine_tdx_1_6_2/:../lighttpd/results_gramine_tdx_1_6_3/ -a lighttpd -e 100,10K -n absolute -m HIB -x threads -l "upper left" --error_bar -t lighttpd_error_bars
 python3 -W ignore $GENERATOR_SCRIPT -d ../lighttpd/results_gramine_tdx_1_6_1/:../lighttpd/results_gramine_tdx_1_6_2/:../lighttpd/results_gramine_tdx_1_6_3/ -a lighttpd -e 100,10K -n overhead -m HIB -x threads -l "upper left" -t lighttpd_overhead
 
-# python
-python3 -W ignore $GENERATOR_SCRIPT -d ../python/results_gramine_tdx_1_6_1/ -a python -e numpy.dot,scipy.fft.fft2,scipy.linalg.svd -n absolute -m LIB -x threads -l "upper right" -t python_single_res
-python3 -W ignore $GENERATOR_SCRIPT -d ../python/results_gramine_tdx_1_6_1/:../python/results_gramine_tdx_1_6_2/:../python/results_gramine_tdx_1_6_3/ -a python -e numpy.dot,scipy.fft.fft2,scipy.linalg.svd -n absolute -m LIB -x threads -l "upper right" -t python
-python3 -W ignore $GENERATOR_SCRIPT -d ../python/results_gramine_tdx_1_6_1/:../python/results_gramine_tdx_1_6_2/:../python/results_gramine_tdx_1_6_3/ -a python -e numpy.dot,scipy.fft.fft2,scipy.linalg.svd -m LIB -x threads -l "upper right" -t python_no_annot
-python3 -W ignore $GENERATOR_SCRIPT -d ../python/results_gramine_tdx_1_6_1/:../python/results_gramine_tdx_1_6_2/:../python/results_gramine_tdx_1_6_3/ -a python -e numpy.dot,scipy.fft.fft2,scipy.linalg.svd -n absolute -m LIB -x threads -l "upper right" --error_bar -t python_error_bars
-python3 -W ignore $GENERATOR_SCRIPT -d ../python/results_gramine_tdx_1_6_1/:../python/results_gramine_tdx_1_6_2/:../python/results_gramine_tdx_1_6_3/ -a python -e numpy.dot,scipy.fft.fft2,scipy.linalg.svd -n overhead -m LIB -x threads -l "upper right" -t python_overhead
+# # python
+# python3 -W ignore $GENERATOR_SCRIPT -d ../python/results_gramine_tdx_1_6_1/ -a python -e numpy.dot,scipy.fft.fft2,scipy.linalg.svd -n absolute -m LIB -x threads -l "upper right" -t python_single_res
+# python3 -W ignore $GENERATOR_SCRIPT -d ../python/results_gramine_tdx_1_6_1/:../python/results_gramine_tdx_1_6_2/:../python/results_gramine_tdx_1_6_3/ -a python -e numpy.dot,scipy.fft.fft2,scipy.linalg.svd -n absolute -m LIB -x threads -l "upper right" -t python
+# python3 -W ignore $GENERATOR_SCRIPT -d ../python/results_gramine_tdx_1_6_1/:../python/results_gramine_tdx_1_6_2/:../python/results_gramine_tdx_1_6_3/ -a python -e numpy.dot,scipy.fft.fft2,scipy.linalg.svd -m LIB -x threads -l "upper right" -t python_no_annot
+# python3 -W ignore $GENERATOR_SCRIPT -d ../python/results_gramine_tdx_1_6_1/:../python/results_gramine_tdx_1_6_2/:../python/results_gramine_tdx_1_6_3/ -a python -e numpy.dot,scipy.fft.fft2,scipy.linalg.svd -n absolute -m LIB -x threads -l "upper right" --error_bar -t python_error_bars
+# python3 -W ignore $GENERATOR_SCRIPT -d ../python/results_gramine_tdx_1_6_1/:../python/results_gramine_tdx_1_6_2/:../python/results_gramine_tdx_1_6_3/ -a python -e numpy.dot,scipy.fft.fft2,scipy.linalg.svd -n overhead -m LIB -x threads -l "upper right" -t python_overhead
 
 # pytorch
 python3 -W ignore $GENERATOR_SCRIPT -d ../pytorch/results_gramine_tdx_1_6_1/ -a pytorch -e default -n absolute -m LIB -x threads -l "upper right" -t pytorch_single_res
@@ -74,16 +95,16 @@ python3 -W ignore $GENERATOR_SCRIPT -d ../redis/results_gramine_tdx_1_6_1/:../re
 python3 -W ignore $GENERATOR_SCRIPT -d ../redis/results_gramine_tdx_1_6_1/:../redis/results_gramine_tdx_1_6_2/:../redis/results_gramine_tdx_1_6_3/ -a redis -e GET,SET,LRANGE-300 -n overhead -m HIB -x experiments -l "upper center" -t redis-experiments_overhead
 
 # redis - memtier-benchmark
-python3 -W ignore $GENERATOR_SCRIPT -d ../redis/results_gramine_tdx_1_6_1/ -a redis  -e memtier-Get,memtier-Set -n absolute -m HIB -x threads -l "upper center" -t redis_memtier_single_res
-python3 -W ignore $GENERATOR_SCRIPT -d ../redis/results_gramine_tdx_1_6_1/:../redis/results_gramine_tdx_1_6_2/:../redis/results_gramine_tdx_1_6_3/ -a redis -e memtier-Get,memtier-Set -n absolute -m HIB -x threads -l "upper center" -t redis_memtier
-python3 -W ignore $GENERATOR_SCRIPT -d ../redis/results_gramine_tdx_1_6_1/:../redis/results_gramine_tdx_1_6_2/:../redis/results_gramine_tdx_1_6_3/ -a redis -e memtier-Get,memtier-Set -m HIB -x threads -l "upper center" -t redis_memtier_no_annot
-python3 -W ignore $GENERATOR_SCRIPT -d ../redis/results_gramine_tdx_1_6_1/:../redis/results_gramine_tdx_1_6_2/:../redis/results_gramine_tdx_1_6_3/ -a redis -e memtier-Get,memtier-Set -n absolute -m HIB -x threads -l "upper center" --error_bar -t redis_memtier_error_bars
-python3 -W ignore $GENERATOR_SCRIPT -d ../redis/results_gramine_tdx_1_6_1/:../redis/results_gramine_tdx_1_6_2/:../redis/results_gramine_tdx_1_6_3/ -a redis -e memtier-Get,memtier-Set -n overhead -m HIB -x threads -l "upper center" -t redis_memtier_overhead
-python3 -W ignore $GENERATOR_SCRIPT -d ../redis/results_gramine_tdx_1_6_1/ -a redis  -e memtier-Get,memtier-Set -n absolute -m HIB -x experiments -l "upper center" -t redis_memtier-experiments_single_res
-python3 -W ignore $GENERATOR_SCRIPT -d ../redis/results_gramine_tdx_1_6_1/:../redis/results_gramine_tdx_1_6_2/:../redis/results_gramine_tdx_1_6_3/ -a redis -e memtier-Get,memtier-Set -n absolute -m HIB -x experiments -l "upper center" -t redis_memtier-experiments
-python3 -W ignore $GENERATOR_SCRIPT -d ../redis/results_gramine_tdx_1_6_1/:../redis/results_gramine_tdx_1_6_2/:../redis/results_gramine_tdx_1_6_3/ -a redis -e memtier-Get,memtier-Set -m HIB -x experiments -l "upper center" -t redis_memtier-experiments_no_annot
-python3 -W ignore $GENERATOR_SCRIPT -d ../redis/results_gramine_tdx_1_6_1/:../redis/results_gramine_tdx_1_6_2/:../redis/results_gramine_tdx_1_6_3/ -a redis -e memtier-Get,memtier-Set -n absolute -m HIB -x experiments -l "upper center" --error_bar -t redis_memtier-experiments_error_bars
-python3 -W ignore $GENERATOR_SCRIPT -d ../redis/results_gramine_tdx_1_6_1/:../redis/results_gramine_tdx_1_6_2/:../redis/results_gramine_tdx_1_6_3/ -a redis -e memtier-Get,memtier-Set -n overhead -m HIB -x experiments -l "upper center" -t redis_memtier-experiments_overhead
+# python3 -W ignore $GENERATOR_SCRIPT -d ../redis/results_gramine_tdx_1_6_1/ -a redis  -e memtier-Get,memtier-Set -n absolute -m HIB -x threads -l "upper center" -t redis_memtier_single_res
+# python3 -W ignore $GENERATOR_SCRIPT -d ../redis/results_gramine_tdx_1_6_1/:../redis/results_gramine_tdx_1_6_2/:../redis/results_gramine_tdx_1_6_3/ -a redis -e memtier-Get,memtier-Set -n absolute -m HIB -x threads -l "upper center" -t redis_memtier
+# python3 -W ignore $GENERATOR_SCRIPT -d ../redis/results_gramine_tdx_1_6_1/:../redis/results_gramine_tdx_1_6_2/:../redis/results_gramine_tdx_1_6_3/ -a redis -e memtier-Get,memtier-Set -m HIB -x threads -l "upper center" -t redis_memtier_no_annot
+# python3 -W ignore $GENERATOR_SCRIPT -d ../redis/results_gramine_tdx_1_6_1/:../redis/results_gramine_tdx_1_6_2/:../redis/results_gramine_tdx_1_6_3/ -a redis -e memtier-Get,memtier-Set -n absolute -m HIB -x threads -l "upper center" --error_bar -t redis_memtier_error_bars
+# python3 -W ignore $GENERATOR_SCRIPT -d ../redis/results_gramine_tdx_1_6_1/:../redis/results_gramine_tdx_1_6_2/:../redis/results_gramine_tdx_1_6_3/ -a redis -e memtier-Get,memtier-Set -n overhead -m HIB -x threads -l "upper center" -t redis_memtier_overhead
+# python3 -W ignore $GENERATOR_SCRIPT -d ../redis/results_gramine_tdx_1_6_1/ -a redis  -e memtier-Get,memtier-Set -n absolute -m HIB -x experiments -l "upper center" -t redis_memtier-experiments_single_res
+# python3 -W ignore $GENERATOR_SCRIPT -d ../redis/results_gramine_tdx_1_6_1/:../redis/results_gramine_tdx_1_6_2/:../redis/results_gramine_tdx_1_6_3/ -a redis -e memtier-Get,memtier-Set -n absolute -m HIB -x experiments -l "upper center" -t redis_memtier-experiments
+# python3 -W ignore $GENERATOR_SCRIPT -d ../redis/results_gramine_tdx_1_6_1/:../redis/results_gramine_tdx_1_6_2/:../redis/results_gramine_tdx_1_6_3/ -a redis -e memtier-Get,memtier-Set -m HIB -x experiments -l "upper center" -t redis_memtier-experiments_no_annot
+# python3 -W ignore $GENERATOR_SCRIPT -d ../redis/results_gramine_tdx_1_6_1/:../redis/results_gramine_tdx_1_6_2/:../redis/results_gramine_tdx_1_6_3/ -a redis -e memtier-Get,memtier-Set -n absolute -m HIB -x experiments -l "upper center" --error_bar -t redis_memtier-experiments_error_bars
+# python3 -W ignore $GENERATOR_SCRIPT -d ../redis/results_gramine_tdx_1_6_1/:../redis/results_gramine_tdx_1_6_2/:../redis/results_gramine_tdx_1_6_3/ -a redis -e memtier-Get,memtier-Set -n overhead -m HIB -x experiments -l "upper center" -t redis_memtier-experiments_overhead
 
 # memcached
 python3 -W ignore $GENERATOR_SCRIPT -d ../memcached/results_gramine_tdx_1_6_1/ -a memcached -e TOTAL -n absolute -m HIB -x threads -l "upper left" -t memcached_single_res

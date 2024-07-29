@@ -13,7 +13,10 @@ app_name_map = {
   "sqlite"                :   "SQLite",
   "sqlite-tmpfs"          :   "SQLite - tmpfs",
   "tensorflow"            :   "TensorFlow",
-  "python"                :   "Python"
+  "python"                :   "Python",
+  "candle"                :   "Candle",
+  "bild"                  :   "Go bild app",
+  "java_image"            :   "Java app"
 }
 
 def main():
