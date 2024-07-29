@@ -4,22 +4,29 @@ set -e
 
 THIS_DIR=$(dirname "$(readlink -f "$0")")
 
+------ start of new apps
+cd $THIS_DIR/bild
+./automated_runner.sh
+
+cd $THIS_DIR/java_image
+./automated_runner.sh
+
+cd $THIS_DIR/candle
+./automated_runner.sh
+
 cd $THIS_DIR/blender
 ./automated_runner.sh
 
 cd $THIS_DIR/pytorch
 ./automated_runner.sh
 
-cd $THIS_DIR/python
-./automated_runner.sh
+# # cd $THIS_DIR/python
+# # ./automated_runner.sh
 
 cd $THIS_DIR/sqlite
 ./automated_runner.sh
 
 cd $THIS_DIR/sqlite-tmpfs
-./automated_runner.sh
-
-cd $THIS_DIR/redis
 ./automated_runner.sh
 
 cd $THIS_DIR/openvino
@@ -28,10 +35,13 @@ cd $THIS_DIR/openvino
 cd $THIS_DIR/lighttpd
 ./automated_runner.sh
 
-cd $THIS_DIR/memcached
+cd $THIS_DIR/redis
 ./automated_runner.sh
 
 cd $THIS_DIR/tensorflow
+./automated_runner.sh
+
+cd $THIS_DIR/memcached
 ./automated_runner.sh
 
 # Generate the plots
